@@ -4,12 +4,13 @@ from __future__ import absolute_import, division, print_function
 
 import numpy as np
 import rospy
+import os
 from .gym_gazebo_env import GymGazeboEnv
 from gym.envs.registration import register
 from std_msgs.msg import Float64
 from gazebo_msgs.msg import LinkStates, ModelStates, ModelState, LinkState
 from std_msgs.msg import Float32MultiArray
-from geometry_msgs.msg import Pose, Twist
+from geometry_msgs.msg import Pose, Twist, WrenchStamped
 from sensor_msgs.msg import Image
 import tf.transformations as tft
 import cv2
@@ -153,28 +154,81 @@ class PoseSensor():
             except:
                 rospy.logerr("Current  /gazebo/link_states not ready yet, retrying for getting  /gazebo/link_states")
 
+
+"""
+ForceSensor for the sidebar tip hook joint
+"""
+class ForceSensor():
+    def __init__(self, topic='/tf_sensor_topic'):
+        self.topic=topic
+        self.force_sub = rospy.Subscriber(self.topic, WrenchStamped, self._force_cb)
+        self.record = []
+        self.force = [0,0,0]
+
+    def _force_cb(self,data):
+        force = data.wrench.force
+        self.record.append([abs(force.x),abs(force.y),abs(force.z)])
+
+    def _data_filter(self):
+        force_array = np.array(self.record)
+        force_average = np.average(force_array,axis=0)
+        #print(force_array, force_average)
+        self.record = []
+        return force_average
+
+    # get sensored force data in x,y,z direction
+    def data(self):
+        return self._data_filter()
+
+    def check_sensor_ready(self):
+        self.force_data = None
+        while self.force_data is None and not rospy.is_shutdown():
+            try:
+                data = rospy.wait_for_message(self.topic, WrenchStamped, timeout=5.0)
+                self.force_data = data.wrench.force
+                rospy.logdebug("Current force sensor READY=>")
+            except:
+                rospy.logerr("Current force sensor not ready yet, retrying for getting force info")
+
 """
 Robot Driver
 """
 class RobotDriver():
-    def __init__(self):
+    def __init__(self,ft=False,safe_max=270):
+        print("use force torque sensor in robot driver", ft)
+        self.force_sensor = ForceSensor('/tf_sensor_topic')
         self.vel_pub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
+        self.use_ft = ft
+        self.safe_max = safe_max
 
     def drive(self,vx,vyaw):
+        s = 1
+        # use a coefficient to low the speed for safety concern
+        if self.use_ft:
+            s = self.safe_coefficient()
         msg = Twist()
-        msg.linear.x = vx
+        msg.linear.x = vx*s
         msg.linear.y = 0
         msg.linear.z = 0
         msg.angular.x = 0
         msg.angular.y = 0
-        msg.angular.z = vyaw
+        msg.angular.z = vyaw*s
         self.vel_pub.publish(msg)
-        # add noise
+
+    def safe_coefficient(self):
+        force = self.force_sensor.data();
+        max = np.amax(force)
+        print("max force", max)
+        if max >= self.safe_max:
+            return 0
+        else:
+            return 1-(max/self.safe_max)
 
     def stop(self):
         self.drive(0,0)
 
     def check_connection(self):
+      self.force_sensor.check_sensor_ready()
       rate = rospy.Rate(10)  # 10hz
       while self.vel_pub.get_num_connections() == 0 and not rospy.is_shutdown():
         rospy.logdebug("No susbribers to vel_pub yet so we wait and try again")
@@ -192,7 +246,7 @@ register(
 
 class DoorOpenTaskEnv(GymGazeboEnv):
 
-  def __init__(self,resolution=(64,64),cam_noise=0.0):
+  def __init__(self,resolution=(64,64),cam_noise=0.0,use_ft=False):
     """
     Initializes a new DoorOpenTaskEnv environment, with define the image size
     and camera noise level (gaussian noise variance, the mean is 0.0)
@@ -212,7 +266,7 @@ class DoorOpenTaskEnv(GymGazeboEnv):
     self.back_camera = CameraSensor(resolution,'/cam_back/image_raw',cam_noise)
     self.up_camera = CameraSensor(resolution,'/cam_up/image_raw',cam_noise)
 
-    self.driver = RobotDriver()
+    self.driver = RobotDriver(ft=use_ft)
     self.pose_sensor = PoseSensor()
 
     self._check_all_sensors_ready()

@@ -43,7 +43,7 @@ if __name__=='__main__':
     ep_rew = 0
     # instantiate agent
     agent_p = DQNAgent(dim_img=(64,64,3),dim_act=act_dim)
-    model_path = os.path.join(sys.path[0], '..', 'saved_models', agent_p.name+'_noise'+str(args.noise), datetime.now().strftime("%Y-%m-%d-%H-%M"))
+    model_path = os.path.join(sys.path[0], '..', 'saved_models', 'door_push',agent_p.name+'_noise'+str(args.noise), datetime.now().strftime("%Y-%m-%d-%H-%M"))
 
     # use tensorboard
     train_loss = tf.keras.metrics.Mean('train_loss', dtype=tf.float32)
