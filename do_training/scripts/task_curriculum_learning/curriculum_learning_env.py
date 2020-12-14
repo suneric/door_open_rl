@@ -34,21 +34,21 @@ class DoorPullAndTraverseTaskEnv(DoorOpenTaskEnv):
 
     def _take_action(self, action_idx):
         v0,v1 = 0,0
-        if stage == 'pull':
+        if self.stage == 'pull':
             _,v0 = self._door_position()
-        elif stage == 'traverse':
+        elif self.stage == 'traverse':
             v0 = self.pose_sensor.robot().position.x
 
         action = self.action_space[action_idx]
         self.driver.drive(action[0],action[1])
         rospy.sleep(0.5)
 
-        if stage == 'pull':
+        if self.stage == 'pull':
             _,v1 = self._door_position()
             self.delta = v1-v0
             self.open = self._door_is_open()
             self.fail = self._door_pull_failed()
-        elif stage == 'traverse':
+        elif self.stage == 'traverse':
             v1 = self.pose_sensor.robot().position.x
             self.delta = -(v1-v0)
             self.success = self._robot_is_out()
@@ -75,8 +75,8 @@ class DoorPullAndTraverseTaskEnv(DoorOpenTaskEnv):
 
     def _is_done(self):
         # switch stage
-        if stage == 'pull' and self.open:
-            stage = 'traverse'
+        if self.stage == 'pull' and self.open:
+            self.stage = 'traverse'
             print("door is open, robot is traversing the doorway")
 
         if self.success or self.fail:
