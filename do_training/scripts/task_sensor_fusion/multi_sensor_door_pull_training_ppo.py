@@ -9,7 +9,7 @@ from datetime import datetime
 import logging
 logging.basicConfig(format='%(asctime)s %(message)s',level=logging.INFO)
 from agents.ppo_conv import PPOAgent, PPOBuffer
-from multi_sensors_env import MS_DoorPullTaskEnv
+from task_pull.door_pull_env import DoorPullTaskEnv
 import rospy
 import tensorflow as tf
 import argparse
@@ -27,7 +27,7 @@ def get_args():
 if __name__=='__main__':
     args = get_args()
     rospy.init_node('ppo_train', anonymous=True, log_level=rospy.INFO)
-    env = MS_DoorPullTaskEnv(resolution=(64,64), cam_noise=args.noise)
+    env = DoorPullTaskEnv(resolution=(64,64), cam_noise=args.noise, use_ft=True)
     dim_obs = (64,64,3)
     dim_act = env.action_dimension()
     agent = PPOAgent(

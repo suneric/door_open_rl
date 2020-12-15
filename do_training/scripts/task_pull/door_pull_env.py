@@ -15,8 +15,8 @@ from math import *
 
 #
 class DoorPullTaskEnv(DoorOpenTaskEnv):
-    def __init__(self,resolution=(64,64),cam_noise=0.0):
-        super(DoorPullTaskEnv, self).__init__(resolution, cam_noise)
+    def __init__(self,resolution=(64,64),cam_noise=0.0,use_ft=False):
+        super(DoorPullTaskEnv, self).__init__(resolution, cam_noise, use_ft)
         self.delta = 0 # door angle change by robot action
         self.success = False
         self.fail = False
