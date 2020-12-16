@@ -364,6 +364,22 @@ class DoorOpenTaskEnv(GymGazeboEnv):
       robot.pose.orientation.z = rq[2]
       robot.pose.orientation.w = rq[3]
       self.robot_pose_pub.publish(robot)
+      # check if reset success
+      rospy.sleep(0.2)
+      pose = self.pose_sensor.robot()
+      if not self._same_position(robot.pose, pose):
+          print("required reset to ", robot.pose)
+          print("current ", pose)
+          self.robot_pose_pub.publish(robot)
+
+  def _same_position(self, pose1, pose2):
+      x1, y1 = pose1.position.x, pose1.position.y
+      x2, y2 = pose2.position.x, pose2.position.y
+      tolerance = 0.001
+      if abs(x1-x2) > tolerance or abs(y1-y2) > tolerance:
+          return False
+      else:
+          return True
 
   def _wait_door_closed(self):
       door_r, door_a = self._door_position()
