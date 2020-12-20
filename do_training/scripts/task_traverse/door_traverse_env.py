@@ -20,6 +20,7 @@ class DoorTraverseTaskEnv(DoorOpenTaskEnv):
         super(DoorTraverseTaskEnv, self).__init__(resolution,cam_noise)
         self.door_pull_policy = pull_policy
         self.door_pull_agent = self._load_door_pull_agent(pull_policy,pull_model)
+        self.open = False
         self.delta = 0 # robot position change in x direction by robot action
         self.success = False
         self.fail = False
@@ -100,12 +101,14 @@ class DoorTraverseTaskEnv(DoorOpenTaskEnv):
     def _load_door_pull_agent(self,pull_policy,pull_model):
         if pull_policy == 'ppo':
             agent = PPOAgent(env_type='discrete',dim_obs=(64,64,3),dim_act=self.action_dimension())
-            model_path = os.path.join(sys.path[0], '..'. 'policy', 'door_pull', pull_model)
-            agent.actor.logits_net = tf.keras.models.load_model(model_path)
+            actor_path = os.path.join(sys.path[0], '..', "trained_policies", "door_pull", pull_model, "logits_net")
+            critic_path = os.path.join(sys.path[0], '..', "trained_policies", "door_pull", pull_model, "val_net")
+            agent.actor.logits_net = tf.keras.models.load_model(actor_path)
+            agent.critic.val_net = tf.keras.models.load_model(critic_path)
             return agent
         else:
-            agent = DQNAgent(name="door_pull",dim_img=(64,64,3),dim_act=self.action_dimension())
-            model_path = os.path.join(sys.path[0], '..', 'policy', 'door_pull', pull_model)
+            agent = DQNAgent(dim_img=(64,64,3),dim_act=self.action_dimension())
+            model_path = os.path.join(sys.path[0], '..', 'trained_policies', 'door_pull', pull_model)
             agent.dqn_active = tf.keras.models.load_model(model_path)
             agent.epsilon = 0.0 # determinitic action without random choice
             return agent

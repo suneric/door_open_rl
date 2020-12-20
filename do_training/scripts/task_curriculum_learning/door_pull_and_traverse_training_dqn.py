@@ -11,8 +11,8 @@ import logging
 logging.basicConfig(format='%(asctime)s %(message)s',level=logging.INFO)
 
 from agents.dqn_conv import DQNAgent
-from envs.door_open_specific_envs import ModelSaver
-from envs.curriculum_learning_env import DoorPullAndTraverseTaskEnv
+from envs.door_open_task_env import ModelSaver
+from curriculum_learning_env import DoorPullAndTraverseTaskEnv
 import rospy
 import tensorflow as tf
 import argparse
@@ -45,8 +45,8 @@ if __name__=='__main__':
     sedimentary_returns = []
     ep_rew = 0
     # instantiate agent
-    agent_p = DQNAgent(name='door_pull_traverse',dim_img=(64,64,3),dim_act=act_dim)
-    model_path = os.path.join(sys.path[0], 'saved_models', agent_p.name, 'models')
+    agent_p = DQNAgent(dim_img=(64,64,3),dim_act=act_dim)
+    model_path = os.path.join(sys.path[0], '..', 'saved_models', 'door_pull_traverse', agent_p.name+'_noise'+str(args.noise), datetime.now().strftime("%Y-%m-%d-%H-%M"))
 
     model_saver = ModelSaver(500)
 

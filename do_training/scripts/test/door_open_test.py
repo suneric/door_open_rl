@@ -256,13 +256,19 @@ def get_args():
     parser.add_argument('--task', type=str, default="pull") # pull, push, traverse
     parser.add_argument('--policy', type=str, default="dqn") # dqn, ppo
     parser.add_argument('--eps', type=int, default=10) # test episode
-    parser.add_argument('--model',type=str, default="dqn_noise0.0") # model folder in folder "policy"
     parser.add_argument('--noise', type=float, default=0.0) # noise variance 0.02
-    parser.add_argument('--actor_model',type=str, default="ppo_noise0.0/logits_net/150") # ppo model in folder "policy"
-    parser.add_argument('--critic_model',type=str, default="ppo_noise0.0/val_net/150") # ppo model in folder "policy"
+    parser.add_argument('--model',type=str, default="dqn_noise0.0") # dqn model
+    parser.add_argument('--actor_model',type=str, default="ppo_noise0.0/logits_net/150") # ppo model
+    parser.add_argument('--critic_model',type=str, default="ppo_noise0.0/val_net/150") # ppo model
     return parser.parse_args()
 
 np.random.seed(7)
+
+# the trained models are located in "trained_policies" folder
+# ppo pull training:
+# python test/door_open_test.py
+# --policy=ppo --task=pull --actor_model=ppo_noise0.0/logits_net --critic_model=ppo_noise0.0/val_net
+# or specifying iteration with a folder name like ppo_noise0.0/val_net/150
 
 if __name__ == "__main__":
     args = get_args()

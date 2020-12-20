@@ -59,9 +59,11 @@ class DoorPullTaskEnv(DoorOpenTaskEnv):
           return False
 
     def _random_init_mobile_robot(self):
-        cx = 0.01*(np.random.uniform()-0.5)+0.07
-        cy = 0.01*(np.random.uniform()-0.5)+0.96
-        theta = 0.1*(np.random.uniform()-0.5)+pi
+        #cx = 0.01*(np.random.uniform()-0.5)+0.07 # for door_room
+        cx = 0.01*(np.random.uniform()-0.5)+0.02 # for office_room
+        cy = 0.01*(np.random.uniform()-0.5)+0.95
+        #theta = 0.1*(np.random.uniform()-0.5)+pi # for door_room
+        theta = 0.5*(np.random.uniform()-0.5)+pi
         camera_pose = np.array([[cos(theta),sin(theta),0,cx],
                                 [-sin(theta),cos(theta),0,cy],
                                 [0,0,1,0.075],

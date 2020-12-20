@@ -256,7 +256,9 @@ class DoorOpenTaskEnv(GymGazeboEnv):
       reset_world_or_sim="WORLD"
     )
 
-    self.door_dim = [0.9144, 0.0698] # length, width
+    # door dimenstion [length,width]
+    #self.door_dim = [0.9144, 0.0698] # door_room
+    self.door_dim = [0.9, 0.045] # office room
     self.info = {}
     self.action_space = 2*np.array([[1.5,3.14],[1.5,0.0],[0.0,3.14],[-1.5,3.14],[-1.5,0.0],[1.5,-3.14],[0.0,-3.14],[-1.5,-3.14]]) # x and yaw velocities
     rospy.logdebug("Start DoorOpenTaskEnv INIT...")
