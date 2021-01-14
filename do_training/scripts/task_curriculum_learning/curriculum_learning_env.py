@@ -13,8 +13,8 @@ from math import *
 from tf.transformations import quaternion_from_euler, euler_from_matrix
 
 class DoorPullAndTraverseTaskEnv(DoorOpenTaskEnv):
-    def __init__(self,resolution=(64,64), cam_noise=0.0):
-        super(DoorPullAndTraverseTaskEnv, self).__init__(resolution,cam_noise)
+    def __init__(self,resolution=(64,64), cam_noise=0.0,use_ft=False):
+        super(DoorPullAndTraverseTaskEnv, self).__init__(resolution,cam_noise,use_ft)
         self.stage = 'pull'
         self.open = False
         self.delta = 0

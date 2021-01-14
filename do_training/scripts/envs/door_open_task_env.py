@@ -163,22 +163,23 @@ class ForceSensor():
         self.topic=topic
         self.force_sub = rospy.Subscriber(self.topic, WrenchStamped, self._force_cb)
         self.record = []
-        self.force = [0,0,0]
+        self.number_of_points = 8
 
     def _force_cb(self,data):
         force = data.wrench.force
-        self.record.append([abs(force.x),abs(force.y),abs(force.z)])
+        if len(self.record) <= self.number_of_points:
+            self.record.append([force.x,force.y,force.z])
+        else:
+            self.record.pop(0)
+            self.record.append([force.x,force.y,force.z])
 
-    def _data_filter(self):
+    def _moving_average(self):
         force_array = np.array(self.record)
-        force_average = np.average(force_array,axis=0)
-        #print(force_array, force_average)
-        self.record = []
-        return force_average
+        return np.mean(force_array,axis=0)
 
     # get sensored force data in x,y,z direction
     def data(self):
-        return self._data_filter()
+        return self._moving_average()
 
     def check_sensor_ready(self):
         self.force_data = None
@@ -217,12 +218,14 @@ class RobotDriver():
 
     def safe_coefficient(self):
         force = self.force_sensor.data();
-        max = np.amax(force)
-        print("max force", max)
+        max = np.amax([abs(i) for i in force])
+        c = 1
         if max >= self.safe_max:
-            return 0
+            c = 0
         else:
-            return 1-(max/self.safe_max)
+            c = 1-(max/self.safe_max)
+        print("max force", max, "speed coefficient", c)
+        return c
 
     def stop(self):
         self.drive(0,0)
