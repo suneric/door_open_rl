@@ -15,12 +15,13 @@ from math import *
 
 #
 class DoorPullEnv(DoorOpenEnv):
-    def __init__(self,resolution=(64,64),cam_noise=0.0):
+    def __init__(self,resolution=(64,64),cam_noise=0.0, use_force=True):
         super(DoorPullEnv, self).__init__(resolution, cam_noise)
         self.delta = 0 # door angle change by robot action
         self.success = False
         self.fail = False
         self.safe = True
+        self.force_in_reward = use_force
 
     def _set_init(self):
       self.driver.stop()
@@ -35,11 +36,13 @@ class DoorPullEnv(DoorOpenEnv):
     def _take_action(self, action_idx):
       _,angle0 = self._door_position()
       action = self.action_space[action_idx]
+      self.info["action"] = action
       self.driver.drive(action[0],action[1])
       rospy.sleep(0.5)
       _,angle1 = self._door_position()
       # update
       self.delta = angle1-angle0
+      self.info["delta_angle"] = self.delta
       self.success = self._door_is_open()
       self.fail = self._door_pull_failed()
       self.safe = self._safe_contact()
@@ -48,23 +51,25 @@ class DoorPullEnv(DoorOpenEnv):
       reward = 0
       if self.success:
           reward = 100
-      elif self.fail or not self.safe:
+      elif self.fail:# or not self.safe:
           reward = -10
       else:
-          reward = 10*self.delta - 0.1
+          penalty = 0.1; # step penalty
+          if not self.safe and self.force_in_reward:
+              penalty += 1 # force safe panalty
+          reward = 10*self.delta - penalty
+      self.info["reward"] = reward
       return reward
 
     def _is_done(self):
-      if self.success or self.fail or not self.safe:
+      if self.success or self.fail:
           return True
       else:
           return False
 
     def _random_init_mobile_robot(self):
-        #cx = 0.01*(np.random.uniform()-0.5)+0.07 # for door_room
         cx = 0.01*(np.random.uniform()-0.5)+0.02 # for office_room
         cy = 0.01*(np.random.uniform()-0.5)+0.95
-        #theta = 0.1*(np.random.uniform()-0.5)+pi # for door_room
         theta = 0.5*(np.random.uniform()-0.5)+pi
         camera_pose = np.array([[cos(theta),sin(theta),0,cx],
                                 [-sin(theta),cos(theta),0,cy],

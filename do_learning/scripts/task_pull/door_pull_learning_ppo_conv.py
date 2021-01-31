@@ -47,6 +47,7 @@ def get_args():
     parser.add_argument('--noise', type=float, default=0.0)
     parser.add_argument('--max_ep', type=int, default=10000)
     parser.add_argument('--max_step', type=int, default=60)
+    parser.add_argument('--use_force_in_reward', type=boolean ,default=True)
     return parser.parse_args()
 
 """
@@ -54,12 +55,14 @@ PPO training with visual observation only
 """
 if __name__=='__main__':
     args = get_args()
+    print("camera noise", args.noise, "max episode", args.max_ep, "max steps", args.max_step, "use force in reward", args.use_force_in_reward)
 
-    buffer_cap = 1000 # buffer capacity
-    train_freq = 500 # training when number of experiences > 500
+    buffer_cap = 600 # buffer capacity
+    train_freq = 500 # training when number of experiences >= 500
     # hyper parameters
     gamma = 0.99 # discount rate
     lamda = 0.97 #
+    beta = 0.001 # influence of entropy loss
     clip_ratio = 0.2 # clip_ratio
     actor_lr = 1e-4 # learning rate of actor
     critic_lr = 3e-4 # learning rate actor
@@ -75,9 +78,9 @@ if __name__=='__main__':
     summary_writer.set_as_default()
 
     #
-    env = DoorPullEnv(resolution=(64,64), cam_noise=args.noise)
+    env = DoorPullEnv(resolution=(64,64), cam_noise=args.noise, use_force=args.use_force_in_reward)
     action_size = env.action_dimension()
-    agent = PPOConvAgent(state_dim=(64,64,3), action_size=action_size, clip_ratio=clip_ratio, lr_a=actor_lr, lr_c=critic_lr)
+    agent = PPOConvAgent(state_dim=(64,64,3), action_size=action_size, clip_ratio=clip_ratio, lr_a=actor_lr, lr_c=critic_lr, beta=beta)
     buffer = ReplayBuffer(input_shape=(64,64,3), action_size=action_size, size=buffer_cap)
 
     start_time = time.time()
@@ -93,6 +96,7 @@ if __name__=='__main__':
             obs = n_obs
             ep_ret += rew
             ep_len += 1
+            # print(info)
             if done:
                 break;
 
@@ -114,6 +118,7 @@ if __name__=='__main__':
         # train models every 500 experiences
         size = buffer.size()
         if size >= train_freq or (ep+1) == args.max_ep:
+            print("ppo training with ",size," experiences...")
             agent.train(data=buffer.get(), batch_size=size, iter_a=iter_a, iter_c=iter_c)
 
         # save models every 500 episodes
@@ -121,4 +126,4 @@ if __name__=='__main__':
             logits_net_path = os.path.join(model_dir, 'logits_net', str(ep+1))
             val_net_path = os.path.join(model_dir, 'val_net', str(ep+1))
             agent.save(logits_net_path, val_net_path)
-            print("save models to ", model_dir)
+            print("save weights to ", model_dir)

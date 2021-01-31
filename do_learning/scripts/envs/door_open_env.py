@@ -229,8 +229,10 @@ class DoorOpenEnv(GymGazeboEnv):
 
     def _action_space(self):
         vx, vz = 1.5, 3.14
-        low, high = 0.5,2
-        action_space = np.array([(low*vx,0),(-low*vx,0),(0,low*vz),(0,-low*vz),(high*vx,0),(-high*vx,0),(0,high*vz),(0,-high*vz)])
+        base = np.array([[vx,vz],[vx,0.0],[0.0,vz],[-vx,vz],[-vx,0.0],[vx,-vz],[0.0,-vz],[-vx,-vz]])
+        low, high = 0.5*base,2*base
+        action_space = np.concatenate((low,high),axis=0)
+        # print(action_space)
         return action_space
 
     def action_dimension(self):
@@ -287,14 +289,13 @@ class DoorOpenEnv(GymGazeboEnv):
         footprint_rf = self._robot_footprint_position(0.25,-0.25)
         footprint_rr = self._robot_footprint_position(-0.25,-0.25)
         camera_pose = self._robot_footprint_position(0.5,-0.25)
-        info = {}
-        info['door'] = (door_radius,door_angle)
-        info['robot'] = [(footprint_lf[0,3],footprint_lf[1,3]),
+        self.info['door'] = (door_radius,door_angle)
+        self.info['robot'] = [(footprint_lf[0,3],footprint_lf[1,3]),
                         (footprint_rf[0,3],footprint_rf[1,3]),
                         (footprint_lr[0,3],footprint_lr[1,3]),
                         (footprint_rr[0,3],footprint_rr[1,3]),
                         (camera_pose[0,3], camera_pose[1,3])]
-        return info
+        return self.info
 
   #############################################################################
     # overidde functions
@@ -313,7 +314,7 @@ class DoorOpenEnv(GymGazeboEnv):
   #############################################################################
     def _safe_contact(self, max=270):
         forces = self.tf_sensor.data()
-        # print("contact forces",forces)
+        self.info["forces"]=forces
         danger = any(f > max for f in forces)
         if danger:
             print("force exceeds safe max (270 N).")
@@ -360,7 +361,7 @@ class DoorOpenEnv(GymGazeboEnv):
     def _door_is_open(self):
         door_r, door_a = self._door_position()
         if door_a > 0.45*math.pi: # 81 degree
-            print("suucess to open the door.")
+            print("success to open the door.")
             return True
         else:
             return False

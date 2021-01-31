@@ -70,20 +70,29 @@ class ReplayBuffer:
         rews = np.append(self.rew_buf[ep_slice],0)
         vals = np.append(self.val_buf[ep_slice],0)
         # rewards-to-go, which is targets for the value function
-        self.ret_buf[ep_slice]=discount_cumsum(rews,gamma)[:-1]
-        # General Advantege Estimation, and normolizatiom
+        self.ret_buf[ep_slice] = discount_cumsum(rews,gamma)[:-1]
+        # General Advantege Estimation
         deltas = rews[:-1]+gamma*vals[1:]-vals[:-1]
-        advs =discount_cumsum(deltas,gamma*lamda)
-        self.adv_buf[ep_slice] = (advs - np.mean(advs))/(np.std(advs)+1e-10)
+        self.adv_buf[ep_slice] = discount_cumsum(deltas,gamma*lamda)
         self.idx = self.ptr
 
     def get(self):
         s = slice(0,self.ptr)
+        # normalize advantage batch-wise
+        advs = self.adv_buf[s]
+        normalized_advs = (advs-np.mean(advs))/(np.std(advs)+1e-10)
         data = dict(states=self.obs_buf[s], actions=self.act_buf[s],
                     returns=self.ret_buf[s], predictions=self.pred_buf[s],
-                    advantages=self.adv_buf[s])
+                    advantages=normalized_advs)
         self.ptr, self.idx = 0, 0
         return data
+
+"""
+loss print call back
+"""
+class PrintLoss(keras.callbacks.Callback):
+    def on_epoch_end(self,epoch,logs={}):
+        print("epoch index", epoch+1, "loss", logs.get('loss'))
 
 """
 The goal of RL is to find an optimal behavior strategy for the agent to obtain optimal rewards. The policy gradient
@@ -108,15 +117,17 @@ references:
 Actor net
 """
 class Actor_Model:
-    def __init__(self, input_shape, action_size, clip_ratio, lr):
+    def __init__(self, input_shape, action_size, clip_ratio, lr, beta):
         self.clip_ratio = clip_ratio
-        self.entropy_loss = 0.001
+        self.beta = beta # hyperparameter that controls the influence of entropy loss
         self.action_size = action_size
         self.actor = self.build_model(input_shape, action_size, lr)
+        self.loss_printer = PrintLoss()
 
     def build_model(self, input_shape, action_size, lr):
         model = conv_net(inputs_dim=input_shape, outputs_dim=action_size, outputs_activation="softmax")
         model.compile(loss=self.ppo_loss, optimizer=keras.optimizers.Adam(learning_rate=lr))
+        print(model.summary())
         return model
 
     """
@@ -127,17 +138,15 @@ class Actor_Model:
     """
     def ppo_loss(self, y_true, y_pred):
         # y_true: np.hstack([advantages, predictions, actions])
-        advs,picks,acts = y_true[:,:1],y_true[:,1:1+self.action_size],y_true[:,1+self.action_size:]
-        # print(advs, picks, acts)
-        # print(y_pred)
+        advs,o_pred,acts = y_true[:,:1],y_true[:,1:1+self.action_size],y_true[:,1+self.action_size:]
+        # print(y_pred, advs, picks, acts)
         prob = y_pred*acts
-        old_prob = picks*acts
+        old_prob = o_pred*acts
         ratio = prob/(old_prob + 1e-10)
         p1 = ratio*advs
-        p2 = K.clip(ratio, 1-self.clip_ratio,1+self.clip_ratio)*advs
-        actor_loss = K.mean(K.minimum(p1,p2))
-        entropy_loss = self.entropy_loss*K.mean(-(y_pred*K.log(y_pred+1e-10)))
-        loss = -(actor_loss+entropy_loss)
+        p2 = K.clip(ratio, 1-self.clip_ratio, 1+self.clip_ratio)*advs
+        # total loss = policy loss + entropy loss (entropy loss for promote action diversity)
+        loss = -K.mean(K.minimum(p1,p2)+self.beta*(-y_pred*K.log(y_pred+1e-10)))
         return loss
 
     def predict(self, state):
@@ -146,14 +155,13 @@ class Actor_Model:
         return digits
 
     def fit(self,states,y_true,epochs,batch_size):
-        hist = self.actor.fit(states, y_true, epochs=epochs, verbose=0, shuffle=True, batch_size=batch_size)
-        return hist.history['loss']
+        self.actor.fit(states, y_true, epochs=epochs, verbose=0, shuffle=True, batch_size=batch_size, callbacks=[self.loss_printer])
 
     def save(self, path):
-        self.actor.save(path)
+        self.actor.save_weights(path)
 
-    def load(self, path, compile):
-        self.actor = keras.models.load_model(path,compile=compile)
+    def load(self, path):
+        self.actor.load_weights(path)
 
 """
 Critic net
@@ -161,10 +169,12 @@ Critic net
 class Critic_Model:
     def __init__(self, input_shape, lr):
         self.critic = self.build_model(input_shape, lr)
+        self.loss_printer = PrintLoss()
 
     def build_model(self, input_shape, lr):
         model = conv_net(inputs_dim=input_shape, outputs_dim=1,outputs_activation="linear")
         model.compile(loss="mse",optimizer=keras.optimizers.Adam(learning_rate=lr))
+        print(model.summary())
         return model
 
     def predict(self,state):
@@ -173,14 +183,13 @@ class Critic_Model:
         return digits
 
     def fit(self,states,y_true,epochs,batch_size):
-        hist = self.critic.fit(states, y_true, epochs=epochs, verbose=0, shuffle=True, batch_size=batch_size)
-        return hist.history['loss']
+        self.critic.fit(states, y_true, epochs=epochs, verbose=0, shuffle=True, batch_size=batch_size, callbacks=[self.loss_printer])
 
     def save(self, path):
-        self.critic.save(path)
+        self.critic.save_weights(path)
 
-    def load(self, path, compile):
-        self.critic = keras.models.load_model(path,compile=compile)
+    def load(self, path):
+        self.critic.load_weights(path)
 
 """
 A PPO agent class using images as input
@@ -193,10 +202,11 @@ class PPOConvAgent:
         clip_ratio=0.2,
         lr_a=1e-4,
         lr_c=3e-4,
+        beta=1e-3
     ):
         self.name = 'ppo_conv'
         self.action_size = action_size
-        self.Actor = Actor_Model(state_dim,action_size,clip_ratio,lr_a)
+        self.Actor = Actor_Model(state_dim,action_size,clip_ratio,lr_a,beta)
         self.Critic = Critic_Model(state_dim,lr_c)
 
     def action(self, state):
@@ -215,12 +225,11 @@ class PPOConvAgent:
         returns = np.vstack(data['returns'])
         # stack everything to numpy array
         y_true = np.hstack([advantages, predictions, actions])
-        print("ppo training with ",batch_size," pieces of experiences...")
         # training Actor and Crtic networks
-        loss_a = self.Actor.fit(states, y_true, iter_a, batch_size)
-        print("actor training loss:", loss_a)
-        loss_c = self.Critic.fit(states, returns, iter_c, batch_size)
-        print("critic training loss:", loss_c)
+        print("training Actor network...")
+        self.Actor.fit(states, y_true, iter_a, batch_size)
+        print("training Actor network...")
+        self.Critic.fit(states, returns, iter_c, batch_size)
 
     def save(self, actor_path, critic_path):
         # save logits_net
@@ -232,6 +241,6 @@ class PPOConvAgent:
             os.makedirs(os.path.dirname(critic_path))
         self.Critic.save(critic_path)
 
-    def load(self, actor_path, critic_path, compile=False):
-        self.Actor.load(actor_path, compile)
-        self.Critic.load(critic_path, compile)
+    def load(self, actor_path, critic_path):
+        self.Actor.load(actor_path)
+        self.Critic.load(critic_path)
