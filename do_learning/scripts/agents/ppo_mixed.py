@@ -187,7 +187,7 @@ class Critic_Model:
         self.loss_printer = PrintLoss()
 
     def build_model(self, image_shape, force_shape, lr):
-        model = mixed_net(image_dim=image_shape, force_dim=force_shape, outputs_dim=1, outputs_activation='softmax')
+        model = mixed_net(image_dim=image_shape, force_dim=force_shape, outputs_dim=1, outputs_activation='linear')
         model.compile(loss="mse",optimizer=keras.optimizers.Adam(learning_rate=lr))
         print(model.summary())
         return model
