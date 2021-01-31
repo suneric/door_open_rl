@@ -47,7 +47,7 @@ def get_args():
     parser.add_argument('--noise', type=float, default=0.0)
     parser.add_argument('--max_ep', type=int, default=10000)
     parser.add_argument('--max_step', type=int, default=60)
-    parser.add_argument('--use_force_in_reward', type=boolean ,default=True)
+    parser.add_argument('--use_force_in_reward', type=bool, default=True)
     return parser.parse_args()
 
 """

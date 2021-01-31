@@ -95,9 +95,9 @@ class ReplayBuffer:
         # normalize advantage batch-wise
         advs = self.adv_buf[s]
         normalized_advs = (advs-np.mean(advs))/(np.std(advs)+1e-10)
-        data = dict(states=self.obs_buf[s], actions=self.act_buf[s],
-                    returns=self.ret_buf[s], predictions=self.pred_buf[s],
-                    advantages=normalized_advs)
+        data = dict(images=self.img_buf[s], forces=self.force_buf[s],
+                    actions=self.act_buf[s], returns=self.ret_buf[s],
+                    predictions=self.pred_buf[s], advantages=normalized_advs)
         self.ptr, self.idx = 0, 0
         return data
 
