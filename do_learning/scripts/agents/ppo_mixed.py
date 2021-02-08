@@ -95,9 +95,9 @@ class ReplayBuffer:
         # normalize advantage batch-wise
         advs = self.adv_buf[s]
         normalized_advs = (advs-np.mean(advs))/(np.std(advs)+1e-10)
-        data = dict(states=self.obs_buf[s], actions=self.act_buf[s],
-                    returns=self.ret_buf[s], predictions=self.pred_buf[s],
-                    advantages=normalized_advs)
+        data = dict(images=self.img_buf[s], forces=self.force_buf[s],
+                    actions=self.act_buf[s], returns=self.ret_buf[s],
+                    predictions=self.pred_buf[s], advantages=normalized_advs)
         self.ptr, self.idx = 0, 0
         return data
 
@@ -187,7 +187,7 @@ class Critic_Model:
         self.loss_printer = PrintLoss()
 
     def build_model(self, image_shape, force_shape, lr):
-        model = mixed_net(image_dim=image_shape, force_dim=force_shape, outputs_dim=1, outputs_activation='softmax')
+        model = mixed_net(image_dim=image_shape, force_dim=force_shape, outputs_dim=1, outputs_activation='linear')
         model.compile(loss="mse",optimizer=keras.optimizers.Adam(learning_rate=lr))
         print(model.summary())
         return model
