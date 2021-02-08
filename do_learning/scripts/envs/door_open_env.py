@@ -82,6 +82,7 @@ class ForceSensor():
         self.force_sub = rospy.Subscriber(self.topic, WrenchStamped, self._force_cb)
         self.record = []
         self.number_of_points = 8
+        self.filtered_record = []
 
     def _force_cb(self,data):
         force = data.wrench.force
@@ -90,6 +91,7 @@ class ForceSensor():
         else:
             self.record.pop(0)
             self.record.append([force.x,force.y,force.z])
+            self.filtered_record.append(self.data())
 
     def _moving_average(self):
         force_array = np.array(self.record)
@@ -98,6 +100,12 @@ class ForceSensor():
     # get sensored force data in x,y,z direction
     def data(self):
         return self._moving_average()
+
+    def reset_filtered(self):
+        self.filtered_record = []
+
+    def filtered(self):
+        return self.filtered_record
 
     def check_sensor_ready(self):
         self.force_data = None
@@ -206,7 +214,6 @@ class DoorOpenEnv(GymGazeboEnv):
             reset_world_or_sim="WORLD"
         )
 
-        self.info = {}
         self.door_dim = [0.9, 0.045] # door dimension [length,width]
         self.action_space = self._action_space()
 
@@ -289,13 +296,14 @@ class DoorOpenEnv(GymGazeboEnv):
         footprint_rf = self._robot_footprint_position(0.25,-0.25)
         footprint_rr = self._robot_footprint_position(-0.25,-0.25)
         camera_pose = self._robot_footprint_position(0.5,-0.25)
-        self.info['door'] = (door_radius,door_angle)
-        self.info['robot'] = [(footprint_lf[0,3],footprint_lf[1,3]),
+        info = {}
+        info['door'] = (door_radius,door_angle)
+        info['robot'] = [(footprint_lf[0,3],footprint_lf[1,3]),
                         (footprint_rf[0,3],footprint_rf[1,3]),
                         (footprint_lr[0,3],footprint_lr[1,3]),
                         (footprint_rr[0,3],footprint_rr[1,3]),
                         (camera_pose[0,3], camera_pose[1,3])]
-        return self.info
+        return info
 
   #############################################################################
     # overidde functions
@@ -314,7 +322,6 @@ class DoorOpenEnv(GymGazeboEnv):
   #############################################################################
     def _safe_contact(self, max=270):
         forces = self.tf_sensor.data()
-        self.info["forces"]=forces
         danger = any(f > max for f in forces)
         if danger:
             print("force exceeds safe max (270 N).")

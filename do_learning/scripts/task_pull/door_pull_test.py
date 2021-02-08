@@ -27,6 +27,13 @@ from agents.ppo_conv import PPOConvAgent
 from agents.ppo_mixed import PPOMixedAgent
 from door_pull_env import DoorPullEnv
 
+def plot_force_and_action(forces, actions):
+    # plt.figure(2)
+    for force in forces:
+        print(force)
+    for action in actions:
+        print(action)
+
 # plot trajectory which contains a sequence of pose of robot and door
 # info {
 #       'door': (radius, angle),
@@ -109,31 +116,32 @@ def trajectory_cost(t):
 # PPO TEST
 def run_ppo_test(episode,env,agent,max_steps):
     success_counter = 0
-    trajectories = []
-    values = []
+    trajectory_list,values_list,forces_list,actions_list = [],[],[],[]
     for ep in range(episode):
-        trajectory = []
-        vals = []
+        trajectory,forces,actions,values = [],[],[],[]
         obs, info = env.reset()
-        trajectory.append(info)
         done = False
         for st in range(max_steps):
             pred, act, val = agent.action(obs)
             n_obs, rew, done, info = env.step(act)
-            obs = n_obs.copy()
             trajectory.append(info)
-            vals.append(v)
+            actions.append(act)
+            values.append(val[0])
+            obs = n_obs
             if done:
+                forces = env.filtered_force_record()
                 break
 
         if env.success:
             success_counter += 1
-            trajectories.append(trajectory)
-            values.append(vals)
+            trajectory_list.append(trajectory)
+            forces_list.append(forces)
+            actions_list.append(actions)
+            values_list.append(values)
 
         print("Succeeded: {} / {}".format(success_counter,ep+1))
 
-    return trajectories, values
+    return trajectory_list, forces_list, actions_list, values_list
 
 ###############################################################################
 # main loop
@@ -164,10 +172,10 @@ if __name__ == "__main__":
     agent = PPOConvAgent(state_dim=(64,64,3), action_size=act_dim)
     if args.policy == "mixed":
         agent = PPOMixedAgent(image_dim=(64,64,3),force_dim=3, action_size=act_dim)
-    actor_path = os.path.join(sys.path[0], '..', "trained_policies", "door_pull", actor_model)
-    critic_path = os.path.join(sys.path[0], '..', "trained_policies", "door_pull", critic_model)
+    actor_path = os.path.join(sys.path[0], '..', "trained_policies", "door_pull", args.actor_model)
+    critic_path = os.path.join(sys.path[0], '..', "trained_policies", "door_pull", args.critic_model)
     agent.load(actor_path, critic_path)
-    trajectories, values = run_ppo_test(args.eps,env,agnet,60)
+    trajectories, forces, actions, values = run_ppo_test(args.eps,env,agent,60)
     if len(trajectories) == 0:
         print("no successful test");
     else:
@@ -194,3 +202,4 @@ if __name__ == "__main__":
         # plot trajectory with lowest cost
         lowest_index = trajectory_costs.index(min(trajectory_costs))
         plot_trajectorty(trajectories[lowest_index])
+        plot_force_and_action(forces[lowest_index], actions[lowest_index])

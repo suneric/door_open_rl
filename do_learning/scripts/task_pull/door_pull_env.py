@@ -32,17 +32,19 @@ class DoorPullEnv(DoorOpenEnv):
       self.success = False
       self.fail = False
       self.safe = True
+      self.tf_sensor.reset_filtered()
+
+    def filtered_force_record(self):
+        return self.tf_sensor.filtered()
 
     def _take_action(self, action_idx):
       _,angle0 = self._door_position()
       action = self.action_space[action_idx]
-      self.info["action"] = action
       self.driver.drive(action[0],action[1])
       rospy.sleep(0.5)
       _,angle1 = self._door_position()
       # update
       self.delta = angle1-angle0
-      self.info["delta_angle"] = self.delta
       self.success = self._door_is_open()
       self.fail = self._door_pull_failed()
       self.safe = self._safe_contact()
@@ -58,7 +60,6 @@ class DoorPullEnv(DoorOpenEnv):
           if not self.safe and self.force_in_reward:
               penalty += 1 # force safe panalty
           reward = 10*self.delta - penalty
-      self.info["reward"] = reward
       return reward
 
     def _is_done(self):

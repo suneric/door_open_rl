@@ -27,8 +27,7 @@ def mixed_net(image_dim, force_dim, outputs_dim, outputs_activation='softmax'):
 
     # force inputs
     f_inputs = keras.Input(shape=force_dim, name="forces")
-    xf = layers.Dense(16,activation='relu')(f_inputs)
-    f_outputs = layers.Dense(8,activation='relu')(xf)
+    f_outputs = layers.Dense(8,activation='relu')(f_inputs)
     f_model = keras.Model(inputs=f_inputs,outputs=f_outputs)
 
     # combile image input and force input
