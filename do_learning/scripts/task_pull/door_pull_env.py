@@ -22,6 +22,11 @@ class DoorPullEnv(DoorOpenEnv):
         self.fail = False
         self.safe = True
         self.force_in_reward = use_force
+        self.radref = None
+
+    # radref = [x,y,theta]
+    def set_random_reference(self, radref=None):
+        self.radref = radref
 
     def _set_init(self):
       self.driver.stop()
@@ -38,6 +43,8 @@ class DoorPullEnv(DoorOpenEnv):
         return self.tf_sensor.filtered()
 
     def _take_action(self, action_idx):
+      self.tf_sensor.reset_step() # get force data during operation
+
       _,angle0 = self._door_position()
       action = self.action_space[action_idx]
       self.driver.drive(action[0],action[1])
@@ -47,7 +54,8 @@ class DoorPullEnv(DoorOpenEnv):
       self.delta = angle1-angle0
       self.success = self._door_is_open()
       self.fail = self._door_pull_failed()
-      self.safe = self._safe_contact()
+
+      self.safe = self._safe_contact(self.tf_sensor.step())
 
     def _compute_reward(self):
       reward = 0
@@ -69,9 +77,14 @@ class DoorPullEnv(DoorOpenEnv):
           return False
 
     def _random_init_mobile_robot(self):
-        cx = 0.01*(np.random.uniform()-0.5)+0.02 # for office_room
-        cy = 0.01*(np.random.uniform()-0.5)+0.95
-        theta = 0.5*(np.random.uniform()-0.5)+pi
+        radref = None
+        if self.radref == None:
+            radref = np.random.uniform(size=3)
+        else:
+            radref = self.radref
+        cx = 0.01*(radref[0]-0.5)+0.02 # for office_room
+        cy = 0.01*(radref[1]-0.5)+0.95
+        theta = 0.5*(radref[2]-0.5)+pi
         camera_pose = np.array([[cos(theta),sin(theta),0,cx],
                                 [-sin(theta),cos(theta),0,cy],
                                 [0,0,1,0.075],

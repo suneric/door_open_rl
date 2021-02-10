@@ -83,6 +83,7 @@ class ForceSensor():
         self.record = []
         self.number_of_points = 8
         self.filtered_record = []
+        self.step_record = []
 
     def _force_cb(self,data):
         force = data.wrench.force
@@ -92,6 +93,7 @@ class ForceSensor():
             self.record.pop(0)
             self.record.append([force.x,force.y,force.z])
             self.filtered_record.append(self.data())
+            self.step_record.append(self.data())
 
     def _moving_average(self):
         force_array = np.array(self.record)
@@ -101,8 +103,16 @@ class ForceSensor():
     def data(self):
         return self._moving_average()
 
+    # get force record of entire trajectory
     def reset_filtered(self):
         self.filtered_record = []
+
+    # get force record of a step range
+    def reset_step(self):
+        self.step_record = []
+
+    def step(self):
+        return self.step_record
 
     def filtered(self):
         return self.filtered_record
@@ -235,7 +245,11 @@ class DoorOpenEnv(GymGazeboEnv):
         rospy.logdebug("Finished DoorOpenTaskEnv INIT...")
 
     def _action_space(self):
-        vx, vz = 1.5, 3.14
+        """
+        [Safety Issues in Human-Robot Interactions]
+        ISO 10218 states that safe slow speed for a robot needs to be limited to 0.25 m.s-1.
+        """
+        vx, vz = 1.0, 3.14
         base = np.array([[vx,vz],[vx,0.0],[0.0,vz],[-vx,vz],[-vx,0.0],[vx,-vz],[0.0,-vz],[-vx,-vz]])
         low, high = 0.5*base,2*base
         action_space = np.concatenate((low,high),axis=0)
@@ -320,11 +334,21 @@ class DoorOpenEnv(GymGazeboEnv):
         raise NotImplementedError()
 
   #############################################################################
-    def _safe_contact(self, max=270):
-        forces = self.tf_sensor.data()
-        danger = any(f > max for f in forces)
+    def _safe_contact(self, record, max=70):
+        """
+        The requirements for door opening force are found in
+        the Americans with Disabilities Act Accessibility Guidelines (ADAAG),
+        ICC/ANSI A117.1 Standard on Accessible and Usable Buildings and Facilities,
+        and the Massachusetts Architectural Access Board requirements (521 CMR)
+        - Interior Doors: 5 pounds of force.(22.24111 N)
+        - Exterior Doors: 15 pounds of force. (66.72333 N)
+        """
+        forces = np.array(record)
+        max_f = np.max(np.absolute(forces), axis=0)
+        print("forces max", max_f)
+        danger = any(f > max for f in max_f)
         if danger:
-            print("force exceeds safe max (270 N).")
+            print("force exceeds safe max: ", max, " N")
             return False
         else:
             return True
