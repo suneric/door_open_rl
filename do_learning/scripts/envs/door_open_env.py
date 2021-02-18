@@ -251,7 +251,7 @@ class DoorOpenEnv(GymGazeboEnv):
         """
         vx, vz = 1.0, 3.14
         base = np.array([[vx,vz],[vx,0.0],[0.0,vz],[-vx,vz],[-vx,0.0],[vx,-vz],[0.0,-vz],[-vx,-vz]])
-        low, high = 0.5*base,2*base
+        low, high = base,3*base
         action_space = np.concatenate((low,high),axis=0)
         # print(action_space)
         return action_space
