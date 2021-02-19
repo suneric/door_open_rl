@@ -302,8 +302,8 @@ def get_args():
     parser.add_argument('--policy', type=str, default="conv") # dqn, ppo
     parser.add_argument('--eps', type=int, default=10) # test episode
     parser.add_argument('--noise', type=float, default=0.0) # noise variance 0.02
-    parser.add_argument('--actor_model',type=str, default="ppo_noise0.0/logits_net/150") # ppo model
-    parser.add_argument('--critic_model',type=str, default="ppo_noise0.0/val_net/150") # ppo model
+    parser.add_argument('--actor_model',type=str, default="ppo_noise0.0/logits_net/10000") # ppo model
+    parser.add_argument('--critic_model',type=str, default="ppo_noise0.0/val_net/10000") # ppo model
     return parser.parse_args()
 
 np.random.seed(7)
@@ -329,36 +329,58 @@ if __name__ == "__main__":
     agent.load(actor_path, critic_path)
     trajectories, forces, actions, values = run_ppo_test(args.eps,env,agent,60,radref100[0:args.eps][:])
     if len(trajectories) == 0:
-        print("no successful test");
+        print("No successful test");
     else:
         # trajectory analysis
         trajectory_steps = [len(i)-1 for i in trajectories]
+        print("====================")
+        print("Success Rate", len(trajectory_steps),"/", args.eps)
+
         average_steps = int(sum(trajectory_steps)/len(trajectory_steps))
-        # trajectory_costs = [round(trajectory_cost(i),3) for i in trajectories]
+        print("Average Steps", average_steps)
+        print("Minimum Steps", min(trajectory_steps))
+        print("Maximum Steps", max(trajectory_steps))
+
         average_values = [sum(vals)/len(vals) for vals in values]
-        highest_values = [max(vals) for vals in values]
-        lowest_values = [min(vals) for vals in values]
-        print("====================")
-        print("Success rate", len(trajectory_steps),"/", args.eps)
-        print("Average steps", average_steps)
-        print("Minimum steps", min(trajectory_steps))
-        print("Maximum steps", max(trajectory_steps))
-        # print("Average Cost", sum(trajectory_costs)/len(trajectory_costs), "meters")
-        # print("Lowest Cost",  min(trajectory_costs), "meters")
-        # print("Highest Cost", max(trajectory_costs), "meters")
         print("Average Value", sum(average_values)/len(average_values))
-        print("Lowest Value",  min(lowest_values))
-        print("Highest Value", max(highest_values))
+        print("Lowest Value",  min(average_values))
+        print("Highest Value", max(average_values))
+
+        max_forces = [np.max(np.absolute(np.array(record)), axis=0) for record in forces]
+        max_forces = [np.max(i) for i in max_forces]
+        print("Average Max_Force", sum(max_forces)/len(max_forces))
+        print("Lowest Max_Force", min(max_forces))
+        print("Highet Max_Force", max(max_forces))
         print("====================")
 
-        # plot trajectory with lowest cost
-        lowest_index = trajectory_steps.index(min(trajectory_steps))
-        steps = len(trajectories[lowest_index])
+        # plot trajectory with least number of steps
+        ls_idx = trajectory_steps.index(min(trajectory_steps))
+        steps = len(trajectories[ls_idx])
+        fig0,ax0 = plt.subplots(2,2)
+        plot_trajectorty(trajectories[ls_idx], ax0[0][0])
+        plot_forces(forces[ls_idx], steps, ax0[0][1])
+        plot_values(values[ls_idx],steps, ax0[1][0])
+        plot_actions(actions[ls_idx], steps, ax0[1][1])
+        fig0.suptitle("Case: Least Number of Steps")
 
-        # plot
-        fig, ax = plt.subplots(2,2)
-        plot_trajectorty(trajectories[lowest_index], ax[0][0])
-        plot_forces(forces[lowest_index], steps, ax[0][1])
-        plot_values(values[lowest_index],steps, ax[1][0])
-        plot_actions(actions[lowest_index], steps, ax[1][1])
+        # plot smallest max force example
+        smf_idx = max_forces.index(min(max_forces))
+        steps = len(trajectories[smf_idx])
+        fig1,ax1 = plt.subplots(2,2)
+        plot_trajectorty(trajectories[smf_idx], ax1[0][0])
+        plot_forces(forces[smf_idx], steps, ax1[0][1])
+        plot_values(values[smf_idx],steps, ax1[1][0])
+        plot_actions(actions[smf_idx], steps, ax1[1][1])
+        fig1.suptitle("Case: Smallest Detected Max Force")
+
+        # plot largest max force example
+        lmf_idx = max_forces.index(max(max_forces))
+        steps = len(trajectories[lmf_idx])
+        fig2,ax2 = plt.subplots(2,2)
+        plot_trajectorty(trajectories[lmf_idx], ax2[0][0])
+        plot_forces(forces[lmf_idx], steps, ax2[0][1])
+        plot_values(values[lmf_idx],steps, ax2[1][0])
+        plot_actions(actions[lmf_idx], steps, ax2[1][1])
+        fig2.suptitle("Case: Largest Detected Max Force")
+
         plt.show()
