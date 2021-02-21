@@ -1,5 +1,28 @@
 # door_open_rl
-Door opening with a wheeled robot using Reinforcement Learning technique
+Door opening with a wheeled robot using Reinforcement Learning techniques
+
+## Prerequisite
+- Ubuntu 18.04
+- [ROS Melodic](http://wiki.ros.org/melodic/Installation/Ubuntu)
+  - Gazebo 9.0, default installed along with ros-melodic-desktop-full or can be installed by following [instruction](http://gazebosim.org/tutorials?tut=install_ubuntu)
+    - for [issue of "Error in REST request" when starting gazebo](https://answers.gazebosim.org//question/25030/gazebo-error-restcc205-error-in-rest-request/)
+    replace url: https://api.ignitionfuel.org by url: https://api.ignitionrobotics.org inside ~/.ignition/fuel/config.yaml
+  - Setup ROS Environment (export below variable in ~/.bashrc)
+    - ROS_HOSTNAME=localhost
+    - ROS_MASTER_URI=http://localhost:11311
+- Install opencv and opencv-python
+```
+sudo apt install libopencv-dev
+python2 pip install opencv-python=4.2.0.32
+```
+- Install [Realsense SDK](https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md) and [Realsense-ros](https://github.com/IntelRealSense/realsense-ros)
+```
+# add repository first, then install realsense sdk
+sudo apt-get install librealsense2-dkms
+sudo apt-get install librealsense2-utils
+# install realsense-ros
+sudo apt-get install ros-melodic-realsense2-camera
+```
 
 ## start gazebo environment
 ```
