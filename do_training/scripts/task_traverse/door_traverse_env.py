@@ -20,7 +20,6 @@ class DoorTraverseTaskEnv(DoorOpenTaskEnv):
         super(DoorTraverseTaskEnv, self).__init__(resolution,cam_noise)
         self.door_pull_policy = pull_policy
         self.door_pull_agent = self._load_door_pull_agent(pull_policy,pull_model)
-        self.open = False
         self.delta = 0 # robot position change in x direction by robot action
         self.success = False
         self.fail = False
@@ -30,7 +29,7 @@ class DoorTraverseTaskEnv(DoorOpenTaskEnv):
         self._reset_mobile_robot(1.5,0.5,0.075,3.14)
         self._wait_door_closed()
         self._reset_mobile_robot(0.61,0.77,0.075,3.3)
-        self.open = self._pull_door()
+        self._pull_door()
         self.delta = 0 # door angle change by robot action
         self.success = False
         self.fail = False
@@ -57,7 +56,7 @@ class DoorTraverseTaskEnv(DoorOpenTaskEnv):
         return reward
 
     def _is_done(self):
-        if not self.open or self.success or self.fail:
+        if self.success or self.fail:
             return True
         else:
             return False
@@ -78,7 +77,7 @@ class DoorTraverseTaskEnv(DoorOpenTaskEnv):
             img = obs.copy()
             for st in range(max_steps):
                 act, _, _ = agent.pi_of_a_given_s(np.expand_dims(img, axis=0))
-                obs,rew,done,info = self.step(act)
+                obs,done = self._door_pull_action(act)
                 img = obs.copy()
                 if done:
                     break
@@ -87,16 +86,29 @@ class DoorTraverseTaskEnv(DoorOpenTaskEnv):
             img = obs.copy()
             for st in range(max_steps):
                 act = agent.epsilon_greedy(img)
-                obs,rew,done,info = self.step(act)
+                obs,done = self._door_pull_action(act)
                 img = obs.copy()
                 if done:
                     break
 
-        if not self._door_is_open():
-            print("door pull failed.")
-            return False
-        else:
-            return True
+    def _door_pull_action(self,action):
+        self.gazebo.unpauseSim()
+        self._take_action(action)
+        self.gazebo.pauseSim()
+        obs = self._get_observation()
+        done = False
+        if self._door_is_open() or self._door_pull_failed():
+            done = True
+        return obs,done
+
+    def _door_pull_failed(self):
+        if not self._robot_is_out():
+            campose_r, campose_a = self._camera_position()
+            doorpose_r, doorpos_a = self._door_position()
+            if campose_r > 1.1*doorpose_r or campose_a > 1.1*doorpos_a:
+                return True
+        return False
+
 
     def _load_door_pull_agent(self,pull_policy,pull_model):
         if pull_policy == 'ppo':
