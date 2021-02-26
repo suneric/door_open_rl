@@ -302,6 +302,7 @@ def get_args():
     parser.add_argument('--policy', type=str, default="conv") # dqn, ppo
     parser.add_argument('--eps', type=int, default=10) # test episode
     parser.add_argument('--noise', type=float, default=0.0) # noise variance 0.02
+    parser.add_argument('--camera', type=str, default='all')
     parser.add_argument('--actor_model',type=str, default="ppo_noise0.0/logits_net/10000") # ppo model
     parser.add_argument('--critic_model',type=str, default="ppo_noise0.0/val_net/10000") # ppo model
     return parser.parse_args()
@@ -319,11 +320,12 @@ if __name__ == "__main__":
     rospy.init_node('door_pull_test', anonymous=True, log_level=rospy.INFO)
 
     # run specific task with specific policy
-    env = DoorPullEnv(resolution=(64,64),cam_noise=args.noise)
+    env = DoorPullEnv(resolution=(64,64),camera= args.camera, cam_noise=args.noise)
     act_dim = env.action_dimension()
-    agent = PPOConvAgent(state_dim=(64,64,3), action_size=act_dim)
+    visual_dim = env.visual_dimension()
+    agent = PPOConvAgent(state_dim=visual_dim, action_size=act_dim)
     if args.policy == "mixed":
-        agent = PPOMixedAgent(image_dim=(64,64,3),force_dim=3, action_size=act_dim)
+        agent = PPOMixedAgent(image_dim=visual_dim,force_dim=3, action_size=act_dim)
     actor_path = os.path.join(sys.path[0], '..', "trained_policies", "door_pull", args.actor_model)
     critic_path = os.path.join(sys.path[0], '..', "trained_policies", "door_pull", args.critic_model)
     agent.load(actor_path, critic_path)

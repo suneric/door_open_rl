@@ -214,7 +214,7 @@ register(
 
 class DoorOpenEnv(GymGazeboEnv):
 
-    def __init__(self,resolution=(64,64),cam_noise=0.0):
+    def __init__(self,resolution=(64,64), camera='all', cam_noise=0.0):
         """
         Initializes a new DoorOpenEnv environment, with define the image size
         and camera noise level (gaussian noise variance, the mean is 0.0)
@@ -230,6 +230,8 @@ class DoorOpenEnv(GymGazeboEnv):
         rospy.logdebug("Start DoorOpenTaskEnv INIT...")
         self.gazebo.unpauseSim()
 
+        self.resolution = resolution
+        self.visual_mode = camera
         self.front_camera = CameraSensor(resolution,'/cam_front/image_raw',cam_noise)
         self.back_camera = CameraSensor(resolution,'/cam_back/image_raw',cam_noise)
         self.up_camera = CameraSensor(resolution,'/cam_up/image_raw',cam_noise)
@@ -261,6 +263,15 @@ class DoorOpenEnv(GymGazeboEnv):
         print("action dimension", dim)
         return dim
 
+    def visual_dimension(self):
+        res = self.resolution
+        if self.visual_mode == 'all':
+            res = (res[0], res[1], 3)
+        else:
+            res = (res[0] ,res[1], 1)
+        print("visual dimension", res)
+        return res
+
     def _check_all_systems_ready(self):
         """
         Checks that all the sensors, publishers and other simulation systems are
@@ -287,6 +298,12 @@ class DoorOpenEnv(GymGazeboEnv):
         img_back = self.back_camera.grey_arr()
         img_up = self.up_camera.grey_arr()
         images = np.concatenate((img_front,img_back,img_up),axis=2)
+        if self.visual_mode == 'up':
+            images = img_up
+        elif self.visual_mode == 'front':
+            images = img_front
+        elif self.visual_mode == 'back':
+            images = img_back
         # force sensor information (x,y,z)
         forces = self.tf_sensor.data()
         return (images, forces)
@@ -296,6 +313,13 @@ class DoorOpenEnv(GymGazeboEnv):
         back = self.back_camera.rgb_image
         up = self.up_camera.rgb_image
         img = np.concatenate((front,back,up),axis=1)
+        if self.visual_mode == 'up':
+            img = up
+        elif self.visual_mode == 'front':
+            img = front
+        elif self.visual_mode == 'back':
+            img = back
+
         cv2.namedWindow("front-back-up")
         img = cv2.resize(img, None, fx=0.5, fy=0.5)
         cv2.imshow('front-back-up',img)

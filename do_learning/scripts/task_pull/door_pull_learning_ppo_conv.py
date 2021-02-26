@@ -48,6 +48,7 @@ def get_args():
     parser.add_argument('--max_ep', type=int, default=10000)
     parser.add_argument('--max_step', type=int, default=60)
     parser.add_argument('--use_force_in_reward', default=True)
+    parser.add_argument('--camera', type=str, default='all')
     return parser.parse_args()
 
 """
@@ -55,7 +56,7 @@ PPO training with visual observation only
 """
 if __name__=='__main__':
     args = get_args()
-    print("camera noise", args.noise, "max episode", args.max_ep, "max steps", args.max_step, "use force in reward", args.use_force_in_reward)
+    print("camera noise", args.noise, "max episode", args.max_ep, "max steps", args.max_step, "use force in reward", args.use_force_in_reward, 'camera', args.camera)
 
     buffer_cap = 600 # buffer capacity
     train_freq = 500 # training when number of experiences >= 500
@@ -78,10 +79,11 @@ if __name__=='__main__':
     summary_writer.set_as_default()
 
     #
-    env = DoorPullEnv(resolution=(64,64), cam_noise=args.noise, use_force=args.use_force_in_reward)
+    env = DoorPullEnv(resolution=(64,64), camera=args.camera, cam_noise=args.noise, use_force=args.use_force_in_reward)
     action_size = env.action_dimension()
-    agent = PPOConvAgent(state_dim=(64,64,3), action_size=action_size, clip_ratio=clip_ratio, lr_a=actor_lr, lr_c=critic_lr, beta=beta)
-    buffer = ReplayBuffer(input_shape=(64,64,3), action_size=action_size, size=buffer_cap)
+    visual_dim = env.visual_dimension()
+    agent = PPOConvAgent(state_dim=visual_dim, action_size=action_size, clip_ratio=clip_ratio, lr_a=actor_lr, lr_c=critic_lr, beta=beta)
+    buffer = ReplayBuffer(input_shape=visual_dim, action_size=action_size, size=buffer_cap)
 
     start_time = time.time()
     success_counter = 0
