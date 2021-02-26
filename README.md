@@ -24,10 +24,27 @@ sudo apt-get install librealsense2-utils
 sudo apt-get install ros-melodic-realsense2-camera
 ```
 
+## dependencies
+- tensorflow 2.1.0 (last version support python 2.7)
+```
+pip install tensorflow==2.1.0
+```
+- gym
+```
+pip install gym
+```
+- scikit-image
+```
+pip install scikit-image
+```
+
 ## start gazebo environment
 ```
 roslaunch do_gazebo door_opening.launch
 ```
+- office_room_0.world is for Geforce RTX 1070
+- offce_room.world is for Geforce RTX 3070, remove one lighting source
+
 
 ## train specific tasks
 - door pulling task
@@ -46,6 +63,11 @@ python door_push_training_ppo.py
 ```
 cd ../do_training/scripts/task_traverse
 python door_traverse_training_ppo.py
+```
+
+## training log
+```
+tensorboard --logdir=saved_models/task_pull
 ```
 
 ## Switch to old environment (door_room.world)
