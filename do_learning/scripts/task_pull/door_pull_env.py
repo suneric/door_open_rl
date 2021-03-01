@@ -15,8 +15,8 @@ from math import *
 
 #
 class DoorPullEnv(DoorOpenEnv):
-    def __init__(self,resolution=(64,64),camera='all',cam_noise=0.0, use_force=True):
-        super(DoorPullEnv, self).__init__(resolution, camera, cam_noise)
+    def __init__(self,resolution=(64,64),camera='all',cam_noise=0.0, use_force=True, door_width=0.9):
+        super(DoorPullEnv, self).__init__(resolution, camera, cam_noise, door_width)
         self.delta = 0 # door angle change by robot action
         self.success = False
         self.fail = False
@@ -82,8 +82,8 @@ class DoorPullEnv(DoorOpenEnv):
             radref = np.random.uniform(size=3)
         else:
             radref = self.radref
-        cx = 0.01*(radref[0]-0.5)+0.02 # for office_room
-        cy = 0.01*(radref[1]-0.5)+0.95
+        cx = 0.01*(radref[0]-0.5)+0.02
+        cy = 0.01*(radref[1]-0.5)+self.door_dim[0]+0.05
         theta = 0.5*(radref[2]-0.5)+pi
         camera_pose = np.array([[cos(theta),sin(theta),0,cx],
                                 [-sin(theta),cos(theta),0,cy],

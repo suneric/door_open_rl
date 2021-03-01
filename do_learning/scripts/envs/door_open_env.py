@@ -214,7 +214,7 @@ register(
 
 class DoorOpenEnv(GymGazeboEnv):
 
-    def __init__(self,resolution=(64,64), camera='all', cam_noise=0.0):
+    def __init__(self,resolution=(64,64), camera='all', cam_noise=0.0, door_width=0.9):
         """
         Initializes a new DoorOpenEnv environment, with define the image size
         and camera noise level (gaussian noise variance, the mean is 0.0)
@@ -224,7 +224,7 @@ class DoorOpenEnv(GymGazeboEnv):
             reset_world_or_sim="WORLD"
         )
 
-        self.door_dim = [0.9, 0.045] # door dimension [length,width]
+        self.door_dim = [door_width, 0.045] # door dimension [length,width]
         self.action_space = self._action_space()
 
         rospy.logdebug("Start DoorOpenTaskEnv INIT...")

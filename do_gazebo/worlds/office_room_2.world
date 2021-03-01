@@ -1,9 +1,9 @@
-<!--default environment for training-->
-<!--door: mass-10kg, width-0.9m, thickness-4.5cm, height-2.1m, color-yellow-->
-<!--door hinge: spring reference-2, spring stiffness-1-->
-<!--door frame: color-grey-->
-<!--wall: color-white-->
-<!--lighting: two lights with one in room-constant=1 and one out room-constant=0.5-->
+<!--environment for testing-->
+<!--door: mass-20kg, width-0.9m, thickness-4.5cm, height-2.1m, color-red-->
+<!--door hinge: spring reference-3, spring stiffness-1-->
+<!--door frame: color-black-->
+<!--wall: color-bricks-->
+<!--lighting: one light in room-constant=1 and one light out room-constant=1-->
 
 <sdf version='1.6'>
   <world name='default'>
@@ -17,7 +17,7 @@
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-              <uri>file://media/materials/obj/frame_90.obj</uri>
+              <uri>file://media/materials/obj/frame.obj</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -26,14 +26,14 @@
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-              <uri>file://media/materials/obj/frame_90.obj</uri>
+              <uri>file://media/materials/obj/frame.obj</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
           <material>
            <script>
             <uri>file://media/materials/scripts/Gazebo.material</uri>
-            <name>Gazebo/Grey</name>
+            <name>Gazebo/Black</name>
            </script>
           </material>
         </visual>
@@ -41,7 +41,7 @@
       <link name="door">
         <pose>-0.045 0 0 0 0 0</pose>
         <inertial>
-          <mass>10</mass>
+          <mass>20</mass>
           <pose>0 0 0 0 0 0</pose>
           <inertia>
             <ixx>14.7</ixx>
@@ -56,7 +56,7 @@
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-              <uri>file://media/materials/obj/door_90.obj</uri>
+              <uri>file://media/materials/obj/door.obj</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -65,14 +65,14 @@
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-              <uri>file://media/materials/obj/door_90.obj</uri>
+              <uri>file://media/materials/obj/door.obj</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
           <material>
            <script>
             <uri>file://media/materials/scripts/Gazebo.material</uri>
-            <name>Gazebo/Yellow</name>
+            <name>Gazebo/Red</name>
            </script>
           </material>
         </visual>
@@ -176,7 +176,7 @@
             <dissipation>0</dissipation>
           </limit>
           <dynamics>
-            <spring_reference>2</spring_reference>
+            <spring_reference>3</spring_reference>
             <spring_stiffness>1</spring_stiffness>
             <damping>0</damping>
             <friction>0</friction>
@@ -210,7 +210,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/Gazebo.material</uri>
-              <name>Gazebo/White</name>
+              <name>Gazebo/Bricks</name>
             </script>
           </material>
         </visual>
@@ -234,7 +234,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/Gazebo.material</uri>
-              <name>Gazebo/White</name>
+              <name>Gazebo/Bricks</name>
             </script>
           </material>
         </visual>
@@ -258,7 +258,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/Gazebo.material</uri>
-              <name>Gazebo/White</name>
+              <name>Gazebo/Bricks</name>
             </script>
           </material>
         </visual>
@@ -282,7 +282,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/Gazebo.material</uri>
-              <name>Gazebo/White</name>
+              <name>Gazebo/Bricks</name>
             </script>
           </material>
         </visual>
@@ -306,7 +306,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/Gazebo.material</uri>
-              <name>Gazebo/White</name>
+              <name>Gazebo/Bricks</name>
             </script>
           </material>
         </visual>
@@ -330,7 +330,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/Gazebo.material</uri>
-              <name>Gazebo/White</name>
+              <name>Gazebo/Bricks</name>
             </script>
           </material>
         </visual>
@@ -408,7 +408,7 @@
      <attenuation>
        <range>10</range>
        <linear>0</linear>
-       <constant>0.5</constant>
+       <constant>1</constant>
      </attenuation>
     </light>
 

@@ -1,9 +1,9 @@
-<!--default environment for training-->
-<!--door: mass-10kg, width-0.9m, thickness-4.5cm, height-2.1m, color-yellow-->
+<!--environment for testing-->
+<!--door: mass-10kg, width-0.9m, thickness-4.5cm, height-2.1m, color-wood-->
 <!--door hinge: spring reference-2, spring stiffness-1-->
-<!--door frame: color-grey-->
-<!--wall: color-white-->
-<!--lighting: two lights with one in room-constant=1 and one out room-constant=0.5-->
+<!--wall: color-painted wall-->
+<!--door frame: color-wood-->
+<!--lighting: one in room-constant=0.2-->
 
 <sdf version='1.6'>
   <world name='default'>
@@ -17,7 +17,7 @@
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-              <uri>file://media/materials/obj/frame_90.obj</uri>
+              <uri>file://media/materials/obj/frame.obj</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -26,14 +26,14 @@
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-              <uri>file://media/materials/obj/frame_90.obj</uri>
+              <uri>file://media/materials/obj/frame.obj</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
           <material>
            <script>
             <uri>file://media/materials/scripts/Gazebo.material</uri>
-            <name>Gazebo/Grey</name>
+            <name>Gazebo/Wood</name>
            </script>
           </material>
         </visual>
@@ -56,7 +56,7 @@
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-              <uri>file://media/materials/obj/door_90.obj</uri>
+              <uri>file://media/materials/obj/door.obj</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -65,14 +65,14 @@
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-              <uri>file://media/materials/obj/door_90.obj</uri>
+              <uri>file://media/materials/obj/door.obj</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
           <material>
            <script>
             <uri>file://media/materials/scripts/Gazebo.material</uri>
-            <name>Gazebo/Yellow</name>
+            <name>Gazebo/Wood</name>
            </script>
           </material>
         </visual>
@@ -210,7 +210,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/Gazebo.material</uri>
-              <name>Gazebo/White</name>
+              <name>Gazebo/PaintedWall</name>
             </script>
           </material>
         </visual>
@@ -234,7 +234,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/Gazebo.material</uri>
-              <name>Gazebo/White</name>
+              <name>Gazebo/PaintedWall</name>
             </script>
           </material>
         </visual>
@@ -258,7 +258,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/Gazebo.material</uri>
-              <name>Gazebo/White</name>
+              <name>Gazebo/PaintedWall</name>
             </script>
           </material>
         </visual>
@@ -282,7 +282,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/Gazebo.material</uri>
-              <name>Gazebo/White</name>
+              <name>Gazebo/PaintedWall</name>
             </script>
           </material>
         </visual>
@@ -306,7 +306,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/Gazebo.material</uri>
-              <name>Gazebo/White</name>
+              <name>Gazebo/PaintedWall</name>
             </script>
           </material>
         </visual>
@@ -330,7 +330,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/Gazebo.material</uri>
-              <name>Gazebo/White</name>
+              <name>Gazebo/PaintedWall</name>
             </script>
           </material>
         </visual>
@@ -349,7 +349,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/Gazebo.material</uri>
-              <name>Gazebo/Gray</name>
+              <name>Gazebo/PaintedWall</name>
             </script>
           </material>
         </visual>
@@ -373,7 +373,7 @@
           <material>
             <script>
               <uri>file://media/materials/scripts/Gazebo.material</uri>
-              <name>Gazebo/Gray</name>
+              <name>Gazebo/PaintedWall</name>
             </script>
           </material>
         </visual>
@@ -396,20 +396,8 @@
       <attenuation>
         <range>10</range>
         <linear>0</linear>
-        <constant>1</constant>
+        <constant>0.2</constant>
       </attenuation>
-    </light>
-    <light name="light1" type="point">
-     <cast_shadows>0</cast_shadows>
-     <diffuse>1 1 1 1</diffuse>
-     <specular>0.3 0.3 0.3 1</specular>
-     <pose>-1.0 1 3 0 0 0</pose>
-     <direction>0 0 -1</direction>
-     <attenuation>
-       <range>10</range>
-       <linear>0</linear>
-       <constant>0.5</constant>
-     </attenuation>
     </light>
 
     <physics type="ode">

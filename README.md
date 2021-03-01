@@ -70,6 +70,13 @@ python door_traverse_training_ppo.py
 tensorboard --logdir=saved_models/task_pull
 ```
 
+## testing
+1. the trained policy can be tested in different environments with different appearances and other physical settings
+```
+roslanch do_gazebo door_opening.launch world:=office_room_{x}
+```
+2. modify the argument of 'mu' in mobile_robot.urdf file to change the friction coefficient between robot wheels and ground
+
 ## Switch to old environment (door_room.world)
 The latest environment (office_room.world) is enriched with, customize door model, lighting and specific ode parameters, while old environment (door_room.world) does not have this features, it use the door from gazebo model base, which contains imperfect mesh and may result bad dynamic simulation performance, but many previous work are done with old environment, so if you want reproduce the old work, you can switch to using old environment.
 1. change to use old world file in "/do_gazebo/launch/door_opening.launch"

@@ -27,7 +27,7 @@ from agents.ppo_conv import PPOConvAgent
 from agents.ppo_mixed import PPOMixedAgent
 from door_pull_env import DoorPullEnv
 
-radref100 = [[0.09244612, 0.28971416, 0.39807551],
+randref_100 = [[0.09244612, 0.28971416, 0.39807551],
        [0.15705888, 0.86593066, 0.48415634],
        [0.62371232, 0.5695015 , 0.21269476],
        [0.95420665, 0.11396594, 0.57269025],
@@ -299,12 +299,16 @@ def run_ppo_test(episode,env,agent,max_steps,radref):
 # main loop
 def get_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--door_width', type=float, default=0.9) # door width
     parser.add_argument('--policy', type=str, default="conv") # dqn, ppo
     parser.add_argument('--eps', type=int, default=10) # test episode
     parser.add_argument('--noise', type=float, default=0.0) # noise variance 0.02
+    parser.add_argument('--max_steps', type=int ,default=60)
     parser.add_argument('--camera', type=str, default='all')
     parser.add_argument('--actor_model',type=str, default="ppo_noise0.0/logits_net/10000") # ppo model
     parser.add_argument('--critic_model',type=str, default="ppo_noise0.0/val_net/10000") # ppo model
+    parser.add_argument('--use_force_in_reward', default=True)
+    parser.add_argument('--plot', default=True)
     return parser.parse_args()
 
 np.random.seed(7)
@@ -320,7 +324,7 @@ if __name__ == "__main__":
     rospy.init_node('door_pull_test', anonymous=True, log_level=rospy.INFO)
 
     # run specific task with specific policy
-    env = DoorPullEnv(resolution=(64,64),camera= args.camera, cam_noise=args.noise)
+    env = DoorPullEnv(resolution=(64,64),camera= args.camera, cam_noise=args.noise, use_force=args.use_force_in_reward, door_width=args.door_width)
     act_dim = env.action_dimension()
     visual_dim = env.visual_dimension()
     agent = PPOConvAgent(state_dim=visual_dim, action_size=act_dim)
@@ -329,7 +333,7 @@ if __name__ == "__main__":
     actor_path = os.path.join(sys.path[0], '..', "trained_policies", "door_pull", args.actor_model)
     critic_path = os.path.join(sys.path[0], '..', "trained_policies", "door_pull", args.critic_model)
     agent.load(actor_path, critic_path)
-    trajectories, forces, actions, values = run_ppo_test(args.eps,env,agent,60,radref100[0:args.eps][:])
+    trajectories, forces, actions, values = run_ppo_test(args.eps,env,agent,args.max_steps,randref_100[0:args.eps][:])
     if len(trajectories) == 0:
         print("No successful test");
     else:
@@ -355,34 +359,34 @@ if __name__ == "__main__":
         print("Highet Max_Force", max(max_forces))
         print("====================")
 
-        # plot trajectory with least number of steps
-        ls_idx = trajectory_steps.index(min(trajectory_steps))
-        steps = len(trajectories[ls_idx])
-        fig0,ax0 = plt.subplots(2,2)
-        plot_trajectorty(trajectories[ls_idx], ax0[0][0])
-        plot_forces(forces[ls_idx], steps, ax0[0][1])
-        plot_values(values[ls_idx],steps, ax0[1][0])
-        plot_actions(actions[ls_idx], steps, ax0[1][1])
-        fig0.suptitle("Case: Least Number of Steps")
+        print("plot trajectory", args.plot)
+        if args.plot:
+            # plot trajectory with least number of steps
+            ls_idx = trajectory_steps.index(min(trajectory_steps))
+            steps = len(trajectories[ls_idx])
+            fig0,ax0 = plt.subplots(2,2)
+            plot_trajectorty(trajectories[ls_idx], ax0[0][0])
+            plot_forces(forces[ls_idx], steps, ax0[0][1])
+            plot_values(values[ls_idx],steps, ax0[1][0])
+            plot_actions(actions[ls_idx], steps, ax0[1][1])
+            fig0.suptitle("Case: Least Number of Steps")
+            # plot smallest max force example
+            smf_idx = max_forces.index(min(max_forces))
+            steps = len(trajectories[smf_idx])
+            fig1,ax1 = plt.subplots(2,2)
+            plot_trajectorty(trajectories[smf_idx], ax1[0][0])
+            plot_forces(forces[smf_idx], steps, ax1[0][1])
+            plot_values(values[smf_idx],steps, ax1[1][0])
+            plot_actions(actions[smf_idx], steps, ax1[1][1])
+            fig1.suptitle("Case: Smallest Detected Max Force")
 
-        # plot smallest max force example
-        smf_idx = max_forces.index(min(max_forces))
-        steps = len(trajectories[smf_idx])
-        fig1,ax1 = plt.subplots(2,2)
-        plot_trajectorty(trajectories[smf_idx], ax1[0][0])
-        plot_forces(forces[smf_idx], steps, ax1[0][1])
-        plot_values(values[smf_idx],steps, ax1[1][0])
-        plot_actions(actions[smf_idx], steps, ax1[1][1])
-        fig1.suptitle("Case: Smallest Detected Max Force")
-
-        # plot largest max force example
-        lmf_idx = max_forces.index(max(max_forces))
-        steps = len(trajectories[lmf_idx])
-        fig2,ax2 = plt.subplots(2,2)
-        plot_trajectorty(trajectories[lmf_idx], ax2[0][0])
-        plot_forces(forces[lmf_idx], steps, ax2[0][1])
-        plot_values(values[lmf_idx],steps, ax2[1][0])
-        plot_actions(actions[lmf_idx], steps, ax2[1][1])
-        fig2.suptitle("Case: Largest Detected Max Force")
-
-        plt.show()
+            # plot largest max force example
+            lmf_idx = max_forces.index(max(max_forces))
+            steps = len(trajectories[lmf_idx])
+            fig2,ax2 = plt.subplots(2,2)
+            plot_trajectorty(trajectories[lmf_idx], ax2[0][0])
+            plot_forces(forces[lmf_idx], steps, ax2[0][1])
+            plot_values(values[lmf_idx],steps, ax2[1][0])
+            plot_actions(actions[lmf_idx], steps, ax2[1][1])
+            fig2.suptitle("Case: Largest Detected Max Force")
+            plt.show()

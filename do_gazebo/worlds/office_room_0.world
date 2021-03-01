@@ -1,3 +1,10 @@
+<!--environment for training-->
+<!--door: mass-10kg, width-0.9m, thickness-4.5cm, height-2.1m, color-yellow-->
+<!--door hinge: spring reference-2, spring stiffness-1-->
+<!--door frame: color-grey-->
+<!--wall: color-white-->
+<!--lighting: one light in room-constant=1-->
+
 <sdf version='1.6'>
   <world name='default'>
     <include>
@@ -10,7 +17,7 @@
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-              <uri>file://media/materials/obj/frame.obj</uri>
+              <uri>file://media/materials/obj/frame_90.obj</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -19,7 +26,7 @@
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-              <uri>file://media/materials/obj/frame.obj</uri>
+              <uri>file://media/materials/obj/frame_90.obj</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -49,7 +56,7 @@
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-              <uri>file://media/materials/obj/door.obj</uri>
+              <uri>file://media/materials/obj/door_90.obj</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
@@ -58,7 +65,7 @@
           <pose>0 0 0 0 0 0</pose>
           <geometry>
             <mesh>
-              <uri>file://media/materials/obj/door.obj</uri>
+              <uri>file://media/materials/obj/door_90.obj</uri>
               <scale>0.01 0.01 0.01</scale>
             </mesh>
           </geometry>
