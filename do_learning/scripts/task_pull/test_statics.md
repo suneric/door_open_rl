@@ -79,6 +79,7 @@ Environments
   - average value: average **97.213**, lowest 84.022 [85], highest 100.905 [57]
   - max force: average 148.215, smallest 30.342 [86] largest 463.159 [78]
   - trajectory of the case with least step  
+  
 ![least step case](images/env0-single-camera-85.png)
 - *multiple cameras*
   - **success rate: 98 / 100**
@@ -87,6 +88,7 @@ Environments
   - average value: average **97.332**, lowest 86.985 [63], highest 100.153 [95]
   - max force: average 191.523, smallest 19.581 [60] largest 756.482 [57]
   - trajectory of the case with least step  
+
 ![least step case](images/env0-multiple-cameras-25.png)
 - *force-vision sensor fusion*   
   - **success rate: 100 / 100**
@@ -95,6 +97,7 @@ Environments
   - average value: average **94.978**, lowest 85.984 [97], highest 96.888 [59]
   - max force: average 182.153, smallest 25.967 [91] largest 826.050 [48]
   - trajectory of the case with least step  
+
 ![least step case](images/env0-force-vision-6.png)
 
 ### env 1
@@ -130,6 +133,7 @@ Environments
   - average value: average **63.274**, lowest 47.699 [18], highest 76.013 [16]
   - max force: average 282.924, smallest 195.541 [50] largest 427.336 [5]
   - trajectory of the case with least step  
+
 ![least step case](images/env1-single-camera-16.png)
 - *multiple cameras*
   - **success rate: 93 / 100**
@@ -138,6 +142,7 @@ Environments
   - average value: average **121.757**, lowest 105.400 [11], highest 131.029 [23]
   - max force: average 289.416, smallest 24.736 [56] largest 835.247 [83]
   - trajectory of the case with least step  
+
 ![least step case](images/env1-multiple-cameras-5.png)
 - *force-vision sensor fusion*   
   - **success rate: 98 / 100**
@@ -146,6 +151,7 @@ Environments
   - average value: average **96.093**, lowest 88.525 [8], highest 105.453 [94]
   - max force: average 213.772, smallest 83.557 [94] largest 705.967 [18]
   - trajectory of the case with least step  
+
 ![least step case](images/env0-force-vision-6.png)
 
 ### env 2
@@ -182,6 +188,7 @@ Environments
   - average value: average **87.226**, lowest 77.046 [12], highest 97.874 [19]
   - max force: average 221.412, smallest 118.263 [17] largest 439.820 [11]
   - trajectory of the case with least step  
+
 ![least step case](images/env2-single-camera-0.png)
 - *multiple cameras*
   - **success rate: 11 / 100**
@@ -190,6 +197,7 @@ Environments
   - average value: average **263.409**, lowest 260.037 [10], highest 267.516 5
   - max force: average 247.133, smallest 86.688 [4] largest 354.034 [5]
   - trajectory of the case with least step  
+
 ![least step case](images/env2-multiple-cameras-2.png)
 - *force-vision sensor fusion*   
   - **success rate: 100 / 100**
@@ -198,6 +206,7 @@ Environments
   - average value: average **90.290**, lowest 86.193 [33], highest 96.886 [29]
   - max force: average 164.474, smallest 61.902 [0] largest 672.001 [53]
   - trajectory of the case with least step  
+
 ![least step case](images/env2-force-vision-71.png)
 
 ### env 3
@@ -234,6 +243,7 @@ Environments
   - average value: average **55.746**, lowest 48.061 [4], highest 65.856 [6]
   - max force: average 163.814, smallest 114.304 [5] largest 234.275 [6]
   - trajectory of the case with least step  
+
 ![least step case](images/env3-single-camera-1.png)
 - *multiple cameras*
   - **success rate: 73 / 100**
@@ -241,7 +251,8 @@ Environments
   - steps: average **12**, minimum 11 [4], maximum 24 [18]
   - average value: average **170.775**, lowest 145.139 [63], highest 195.609 [46]
   - max force: average 243.057, smallest 75.241 [13] largest 791.945 [71]
-  - trajectory of the case with least step  
+  - trajectory of the case with least step
+
 ![least step case](images/env3-multiple-cameras-4.png)
 - *force-vision sensor fusion*   
   - **success rate: 100 / 100**
@@ -250,6 +261,7 @@ Environments
   - average value: average **81.165**, lowest 75.127 [71], highest 86.228 [73]
   - max force: average 205.455, smallest 42.100 [85] largest 699.727 [38]
   - trajectory of the case with least step  
+
 ![least step case](images/env3-force-vision-0.png)
 
 ### env 4
@@ -284,7 +296,8 @@ Environments
   - steps: average **19**, minimum 17 [3], maximum 24 [4]
   - average value: average **78.247**, lowest 65.137 [1], highest 89.616 [0]
   - max force: average 305.611, smallest 196.409 [4] largest 420.931 [0]
-  - trajectory of the case with least step  
+  - trajectory of the case with least step
+
 ![least step case](images/env4-single-camera-3.png)
 - *multiple cameras*
   - **success rate: 42 / 100**
@@ -293,6 +306,7 @@ Environments
   - average value: average **152.508**, lowest 92.918 [11], highest 189.009 [16]
   - max force: average 186.881, smallest 77.614 [26] largest 558.366 [13]
   - trajectory of the case with least step  
+
 ![least step case](images/env4-multiple-cameras-0.png)
 - *force-vision sensor fusion*   
   - **success rate: 83 / 100**
@@ -300,7 +314,8 @@ Environments
   - steps: average **15**, minimum 14 [10], maximum 27 [80]
   - average value: average **89.734**, lowest 80.222 [33], highest 90.109 [8]
   - max force: average 156.385, smallest 69.380 [46] largest 347.058 [77]
-  - trajectory of the case with least step  
+  - trajectory of the case with least step
+
 ![least step case](images/env4-force-vision-10.png)
 
 ### env 5
@@ -340,5 +355,6 @@ Environments
   - steps: average **14**, minimum 12 [0], maximum 36 [23]
   - average value: average **90.206**, lowest 85.573 [46], highest 95.281 [50]
   - max force: average 240.688, smallest 50.582 [35] largest 700.568 [23]
-  - trajectory of the case with least step  
+  - trajectory of the case with least step
+
 ![least step case](images/env5-force-vision-0.png)
