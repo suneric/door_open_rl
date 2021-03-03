@@ -303,7 +303,7 @@ def run_ppo_test(episode,env,agent,max_steps,radref):
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--door_width', type=float, default=0.9) # door width
-    parser.add_argument('--policy', type=str, default="conv") # dqn, ppo
+    parser.add_argument('--policy', type=str, default="conv") # conv, mixed
     parser.add_argument('--eps', type=int, default=10) # test episode
     parser.add_argument('--noise', type=float, default=0.0) # noise variance 0.02
     parser.add_argument('--max_steps', type=int ,default=60)
@@ -314,7 +314,7 @@ def get_args():
     parser.add_argument('--plot', default=True)
     return parser.parse_args()
 
-np.random.seed(7)
+np.random.seed(123)
 
 # the trained models are located in "trained_policies" folder
 # ppo pull training:
@@ -333,8 +333,8 @@ if __name__ == "__main__":
     agent = PPOConvAgent(state_dim=visual_dim, action_size=act_dim)
     if args.policy == "mixed":
         agent = PPOMixedAgent(image_dim=visual_dim,force_dim=3, action_size=act_dim)
-    actor_path = os.path.join(sys.path[0], '..', "trained_policies", "door_pull", args.actor_model)
-    critic_path = os.path.join(sys.path[0], '..', "trained_policies", "door_pull", args.critic_model)
+    actor_path = os.path.join(sys.path[0], '..', "policy", "door_pull", args.actor_model)
+    critic_path = os.path.join(sys.path[0], '..', "policy", "door_pull", args.critic_model)
     agent.load(actor_path, critic_path)
 
     trajectories, forces, actions, values, failures = run_ppo_test(args.eps,env,agent,args.max_steps,randref_100[0:args.eps][:])

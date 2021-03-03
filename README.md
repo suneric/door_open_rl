@@ -25,9 +25,9 @@ sudo apt-get install ros-melodic-realsense2-camera
 ```
 
 ## dependencies
-- tensorflow 2.1.0 (last version support python 2.7)
+- tensorflow 2.1.0 (last version support python 2.7) (tensorflow_probability is used in do_training)
 ```
-pip install tensorflow==2.1.0
+pip install tensorflow==2.1.0 tensorflow_probability=0.9.0
 ```
 - gym
 ```
@@ -49,19 +49,19 @@ roslaunch do_gazebo door_opening.launch
 ## train specific tasks
 - door pulling task
 ```
-cd ../do_training/scripts/task_pull
+cd ../do_learning/scripts/task_pull
 python door_pull_training_ppo.py
 ```
 
 - door pushing task
 ```
-cd ../do_training/scripts/task_push
+cd ../do_learning/scripts/task_push
 python door_push_training_ppo.py
 ```
 
 - door traversing task
 ```
-cd ../do_training/scripts/task_traverse
+cd ../do_learning/scripts/task_traverse
 python door_traverse_training_ppo.py
 ```
 
@@ -77,9 +77,9 @@ roslanch do_gazebo door_opening.launch world:=office_room_{x}
 ```
 2. modify the argument of 'mu' in mobile_robot.urdf file to change the friction coefficient between robot wheels and ground
 
-## Switch to old environment (door_room.world)
-The latest environment (office_room.world) is enriched with, customize door model, lighting and specific ode parameters, while old environment (door_room.world) does not have this features, it use the door from gazebo model base, which contains imperfect mesh and may result bad dynamic simulation performance, but many previous work are done with old environment, so if you want reproduce the old work, you can switch to using old environment.
-1. change to use old world file in "/do_gazebo/launch/door_opening.launch"
-2. change the friction parameters for wheel to 0.1 in "/do_description/urdf/fourwheeler_base.urdf.xacro"
-3. change door dimension to [0.9144 0.0698] and corresponding initial position of robot base in classes DoorOpenTaskEnv and DoorPullTaskEnv
-The trained policies with old environment is located in "do_training/scripts/trained_policies/old"
+## Switch to old environment (door_room.world) using do_training
+```
+roslanch do_gazebo door_opening.launch world:=door_room
+```
+The latest environment (office_room.world) is enriched with, customize door model, lighting and specific ode parameters, while old environment (door_room.world) does not have this features, it used the existing door from gazebo model base, which contains imperfect mesh and may result bad dynamic simulation performance, but many previous work are done with old environment.
+- change the friction coefficients (mu1, mu2) to 0.1 in "/do_description/urdf/mobile_robot.urdf.xacro"
