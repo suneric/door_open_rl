@@ -17,7 +17,7 @@ where step_penalty is 0.1, force_penalty is 1 when detected force exceeds 70 N, 
 ### training performance
 The training performance (episodic total reward)
 
-![total-reward](images/epsiode-total-reward.svg)
+![total-reward](https://github.com/suneric/door_open_rl/blob/main/do_learning/scripts/task_pull/images/episode-total-reward.svg)
 
 Conclusion: vision-force sensor fusion > multiple cameras > single camera
 
