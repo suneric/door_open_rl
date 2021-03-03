@@ -265,6 +265,7 @@ def trajectory_cost(t):
 ###############################################################################
 # PPO TEST
 def run_ppo_test(episode,env,agent,max_steps,radref):
+    failure_list = []
     success_counter = 0
     trajectory_list,values_list,forces_list,actions_list = [],[],[],[]
     for ep in range(episode):
@@ -290,10 +291,12 @@ def run_ppo_test(episode,env,agent,max_steps,radref):
             forces_list.append(forces)
             actions_list.append(actions)
             values_list.append(values)
+        else:
+            failure_list.append(ep)
 
         print("Succeeded: {} / {}".format(success_counter,ep+1))
 
-    return trajectory_list, forces_list, actions_list, values_list
+    return trajectory_list, forces_list, actions_list, values_list, failure_list
 
 ###############################################################################
 # main loop
@@ -333,7 +336,8 @@ if __name__ == "__main__":
     actor_path = os.path.join(sys.path[0], '..', "trained_policies", "door_pull", args.actor_model)
     critic_path = os.path.join(sys.path[0], '..', "trained_policies", "door_pull", args.critic_model)
     agent.load(actor_path, critic_path)
-    trajectories, forces, actions, values = run_ppo_test(args.eps,env,agent,args.max_steps,randref_100[0:args.eps][:])
+
+    trajectories, forces, actions, values, failures = run_ppo_test(args.eps,env,agent,args.max_steps,randref_100[0:args.eps][:])
     if len(trajectories) == 0:
         print("No successful test");
     else:
@@ -341,22 +345,23 @@ if __name__ == "__main__":
         trajectory_steps = [len(i)-1 for i in trajectories]
         print("====================")
         print("Success Rate", len(trajectory_steps),"/", args.eps)
+        print("failure indice", failures)
 
         average_steps = int(sum(trajectory_steps)/len(trajectory_steps))
         print("Average Steps", average_steps)
-        print("Minimum Steps", min(trajectory_steps))
-        print("Maximum Steps", max(trajectory_steps))
+        print("Minimum Steps", min(trajectory_steps), "index", trajectory_steps.index(min(trajectory_steps)))
+        print("Maximum Steps", max(trajectory_steps), "index", trajectory_steps.index(max(trajectory_steps)))
 
         average_values = [sum(vals)/len(vals) for vals in values]
         print("Average Value", sum(average_values)/len(average_values))
-        print("Lowest Value",  min(average_values))
-        print("Highest Value", max(average_values))
+        print("Lowest Value",  min(average_values), "index", average_values.index(min(average_values)))
+        print("Highest Value", max(average_values), "index", average_values.index(max(average_values)))
 
         max_forces = [np.max(np.absolute(np.array(record)), axis=0) for record in forces]
         max_forces = [np.max(i) for i in max_forces]
         print("Average Max_Force", sum(max_forces)/len(max_forces))
-        print("Lowest Max_Force", min(max_forces))
-        print("Highet Max_Force", max(max_forces))
+        print("Lowest Max_Force", min(max_forces), "index", max_forces.index(min(max_forces)))
+        print("Highet Max_Force", max(max_forces), "index", max_forces.index(max(max_forces)))
         print("====================")
 
         print("plot trajectory", args.plot)

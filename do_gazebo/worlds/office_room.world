@@ -2,6 +2,7 @@
 <!--door: mass-10kg, width-0.9m, thickness-4.5cm, height-2.1m, color-yellow-->
 <!--door hinge: spring reference-2, spring stiffness-1-->
 <!--door frame: color-grey-->
+<!--door handle: color-white-->
 <!--wall: color-white-->
 <!--lighting: two lights with one in room-constant=1 and one out room-constant=0.5-->
 

@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 
 <robot name="mobile_robot" xmlns:xacro="https://www.ros.org/wiki/xacro" >
-    <xacro:arg name="mu" default="0.98" />
+    <xacro:arg name="mu1" default="0.7" />
+    <xacro:arg name="mu2" default="0.98" />
     <xacro:property name="cam_support_x" value="0.05" />
     <xacro:property name="cam_support_y" value="0.05" />
     <xacro:property name="cam_support_z" value="0.2" />
@@ -9,7 +10,8 @@
 
     <!--mobile base-->
     <xacro:include filename="$(find do_description)/urdf/fourwheeler_base.urdf.xacro" />
-      <xacro:property name="friction" value="$(arg mu)"/>
+      <xacro:property name="friction_k" value="$(arg mu1)"/>
+      <xacro:property name="friction_s" value="$(arg mu2)"/>
     <xacro:fourwheeler_base_macro/>
 
     <!--camera support-->

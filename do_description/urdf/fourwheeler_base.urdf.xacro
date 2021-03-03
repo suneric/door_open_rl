@@ -1,7 +1,8 @@
 <?xml version="1.0" ?>
 
 <robot xmlns:xacro="https://www.ros.org/wiki/xacro" >
-    <xacro:property name="friction" value="0.98"/>
+    <xacro:property name="friction_k" value="0.98"/>
+    <xacro:property name="friction_s" value="0.98"/>
     <xacro:property name="PI" value="3.1415926535897931"/>
     <xacro:property name="chassis_x" value="0.42" />
     <xacro:property name="chassis_y" value="0.4" />
@@ -345,26 +346,26 @@
       </gazebo>
 
       <gazebo reference="link_lrwheel">
-        <mu1>${friction}</mu1>
-        <mu2>${friction}</mu2>
+        <mu1>${friction_k}</mu1>
+        <mu2>${friction_s}</mu2>
         <material>Gazebo/Black</material>
       </gazebo>
 
       <gazebo reference="link_rrwheel">
-        <mu1>${friction}</mu1>
-        <mu2>${friction}</mu2>
+        <mu1>${friction_k}</mu1>
+        <mu2>${friction_s}</mu2>
         <material>Gazebo/Black</material>
       </gazebo>
 
       <gazebo reference="link_lfwheel">
-        <mu1>${friction}</mu1>
-        <mu2>${friction}</mu2>
+        <mu1>${friction_k}</mu1>
+        <mu2>${friction_s}</mu2>
         <material>Gazebo/Black</material>
       </gazebo>
 
       <gazebo reference="link_rfwheel">
-        <mu1>${friction}</mu1>
-        <mu2>${friction}</mu2>
+        <mu1>${friction_k}</mu1>
+        <mu2>${friction_s}</mu2>
         <material>Gazebo/Black</material>
       </gazebo>
 

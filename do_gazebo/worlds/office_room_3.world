@@ -2,6 +2,7 @@
 <!--door: mass-15kg, width-0.75m, thickness-4.5cm, height-2.1m, color-wood pallet-->
 <!--door hinge: spring reference-2, spring stiffness-1-->
 <!--door frame: color-flat black-->
+<!--door handle: color-white-->
 <!--wall: color-yellow-->
 <!--lighting: one light in room-constant=0.5 and one light out room-constant=0.5-->
 
