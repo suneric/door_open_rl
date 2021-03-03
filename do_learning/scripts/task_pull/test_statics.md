@@ -4,14 +4,14 @@ Three PPO policies were trained for comparison.
 - multi-camera fusion (looking up, looking forward, and looking backward)
 - force-vision fusion (one camera looking up and a force sensor at the joint of the sidebar)
 
-Camera perspectives
+**Camera perspectives**
 
 ![m-camera](images/multi-camera.png)
-Reward function (same for all three policies)
+
+**Reward function** (same for all three policies)
 - if success, reward = 100
 - else if fail ,reward = -10
-- else reward = 10*delta_door_angle - step_penalty - force_penalty
-where step_penalty is 0.1, force_penalty is 1 when detected force exceeds 70 N, otherwise 0.
+- else *reward = 10*delta_door_angle - step_penalty - force_penalty*, where step_penalty is 0.1, force_penalty is 1 when detected force exceeds 70 N, otherwise 0.
 
 ## Summary  
 ### training performance
@@ -48,6 +48,7 @@ Environments
 ### env 0 - training environment
 ![env-0](images/env_0.png)
 100 test cases with random initial pose of the mobile robot
+
 **Environment Settings**
 - door:
   - mass: 10kg
@@ -69,6 +70,7 @@ Environments
   - one out room: constant = 0.5
 - wheel-ground friction: mu1=0.98, mu2=0.98
 - camera noise: 0.00
+
 **Test Statistics**
 - *single camera*
   - **success rate: 100 / 100**
@@ -98,6 +100,7 @@ Environments
 ### env 1
 ![env-1](images/env_1.png)
 100 test cases with random initial pose of the mobile robot
+
 **Environment Settings**
 - door:
   - mass: 10kg
@@ -118,6 +121,7 @@ Environments
   - one in room: constant = 0.2
 - wheel-ground friction: mu1=0.98, mu2=0.98
 - camera noise: 0.00
+
 **Test Statistics**
 - *single camera*
   - **success rate: 55 / 100**
@@ -147,6 +151,7 @@ Environments
 ### env 2
 ![env-2](images/env_2.png)
 100 test cases with random initial pose of the mobile robot
+
 **Environment Settings**
 - door:
   - mass: **20kg**
@@ -168,6 +173,7 @@ Environments
   - one out room: constant = 1
 - **wheel-ground friction**: mu1=0.5, mu2=0.5
 - camera noise: 0.00
+
 **Test Statistics**
 - *single camera*
   - **success rate: 20 / 100**
@@ -197,6 +203,7 @@ Environments
 ### env 3
 ![env-3](images/env_3.png)
 100 test cases with random initial pose of the mobile robot
+
 **Environment Settings**
 - door:
   - mass: **15kg**
@@ -218,6 +225,7 @@ Environments
   - one out room: constant = 0.5
 - **wheel-ground friction**: mu1=0.7, mu2=0.98
 - camera noise: 0.00
+
 **Test Statistics**
 - *single camera*
   - **success rate: 7 / 100**
@@ -247,6 +255,7 @@ Environments
 ### env 4
 ![env-4](images/env_4.png)
 100 test cases with random initial pose of the mobile robot
+
 **Environment Settings**
 - door:
   - mass: **30kg**
@@ -267,6 +276,7 @@ Environments
   - one in room: constant = 0.2
 - **wheel-ground friction**: mu1=0.7, mu2=0.98
 - camera noise: 0.00
+
 **Test Statistics**
 - *single camera*
   - **success rate: 5 / 100**
@@ -296,6 +306,7 @@ Environments
 ### env 5
 ![env-5](images/env_2.png)
 100 test cases with random initial pose of the mobile robot
+
 **Environment Settings**
 - door:
   - mass: **20kg**
@@ -317,6 +328,7 @@ Environments
   - one out room: constant = 1
 - **wheel-ground friction**: mu1=0.7, mu2=0.98
 - camera noise: Gaussian noise with variance of 0.02
+
 **Test Statistics**
 - *single camera*
   - **success rate: 0 / 100**

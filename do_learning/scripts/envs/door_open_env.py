@@ -65,6 +65,12 @@ class CameraSensor():
         img_arr = img_arr.reshape((64,64,1))
         return img_arr
 
+    # blind camera
+    def zero_arr(self):
+        img_arr = np.zeros(self.resolution)
+        img_arr = img_arr.reshape((64,64,1))
+        return img_arr
+
     def _guass_noisy(self,image,var):
         if var > 0:
             img = skimage.util.img_as_float(image)
@@ -304,6 +310,8 @@ class DoorOpenEnv(GymGazeboEnv):
             images = img_front
         elif self.visual_mode == 'back':
             images = img_back
+        elif self.visual_mode == 'blind':
+            images = self.up_camera.zero_arr()
         # force sensor information (x,y,z)
         forces = self.tf_sensor.data()
         return (images, forces)
@@ -319,6 +327,8 @@ class DoorOpenEnv(GymGazeboEnv):
             img = front
         elif self.visual_mode == 'back':
             img = back
+        elif self.visual_mode == 'blind':
+            img = self.up_camera.zero_arr()
 
         cv2.namedWindow("front-back-up")
         img = cv2.resize(img, None, fx=0.5, fy=0.5)
