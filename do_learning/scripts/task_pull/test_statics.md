@@ -24,7 +24,7 @@ Conclusion: vision-force sensor fusion > multiple cameras > single camera
 ### policy evaluation (in the environment for training)
 | \ | success rate | average steps | average max-force (N) | least step case trajectory cost (robot+sidebar) (m) |
 | :----: | :----: | :----: | :----: | :----: |
-| single camera input | 100% | 16 (13-20) | 148 (30 - 463) | 0.835 + 1.247 |
+| single-camera input | 100% | 16 (13-20) | 148 (30 - 463) | 0.835 + 1.247 |
 | multi-camera fusion | 98% |13 (10-47) | 191 (19 - 756) | 0.893 + 1.108 |
 | force-vision fusion | 100% |11 (10-13) | 182 (26-826) | 0.571 + 1.015 |
 

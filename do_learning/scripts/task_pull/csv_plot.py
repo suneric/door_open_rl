@@ -36,8 +36,8 @@ def plot_training_performance():
 
     fig = go.Figure()
     fig.add_trace(go.Scatter(x = df0['Step'], y = smoothExponential(df0['Value'],0.996),name='force-only input'))
-    fig.add_trace(go.Scatter(x = df1['Step'], y = smoothExponential(df1['Value'],0.996),name='fingle-vision input'))
-    fig.add_trace(go.Scatter(x = df2['Step'], y = smoothExponential(df2['Value'],0.996),name='multi-vision fusion'))
+    fig.add_trace(go.Scatter(x = df1['Step'], y = smoothExponential(df1['Value'],0.996),name='single-camera input'))
+    fig.add_trace(go.Scatter(x = df2['Step'], y = smoothExponential(df2['Value'],0.996),name='multi-camera fusion'))
     fig.add_trace(go.Scatter(x = df3['Step'], y = smoothExponential(df3['Value'],0.996),name='force-vision fusion'))
     fig.update_layout(
         title="Episodic Total Reward",
@@ -59,8 +59,8 @@ def plot_generalize_capability():
     y3 = [100, 98, 100, 100, 83, 53]
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x = x, y = y1, name='fingle-vision input'))
-    fig.add_trace(go.Scatter(x = x, y = y2, name='multi-vision fusion'))
+    fig.add_trace(go.Scatter(x = x, y = y1, name='single-camera input'))
+    fig.add_trace(go.Scatter(x = x, y = y2, name='multi-camera fusion'))
     fig.add_trace(go.Scatter(x = x, y = y3, name='force-vision fusion'))
     fig.update_layout(
         title="Policy Generalization",
