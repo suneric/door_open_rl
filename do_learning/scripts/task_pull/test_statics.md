@@ -17,7 +17,7 @@ Three PPO policies were trained for comparison.
 ### training performance
 The training performance (episodic total reward)
 
-![total-reward](https://github.com/suneric/door_open_rl/blob/main/do_learning/scripts/task_pull/images/episode-total-reward.svg)
+![total-reward](images/episode-total-reward.png)
 
 Conclusion: vision-force sensor fusion > multiple cameras > single camera
 
@@ -42,7 +42,9 @@ Environments
 - env-2: different settings in door color, door frame color, wall color, lighting condition, wheel-ground friction coefficients, door hinge spring force
 - env-3: different settings in door width, door color, door frame color, wall color, lighting condition, wheel-ground friction coefficients
 - env-4: different settings in door width, door color, door frame color, door handle color, wall color, lighting condition, wheel-ground friction coefficients, door hinge spring force
-- env-5: env-2 with changing wheel-ground **friction coefficients** and adding **camera noise** (Gaussian noise with variance of 0.02)   
+- env-5: env-2 with changing wheel-ground **friction coefficients** and adding **camera noise** (Gaussian noise with variance of 0.02)
+
+![generalize](images/generalization.png)   
 
 ## Environments and Statistics
 ### env 0 - training environment
@@ -79,7 +81,7 @@ Environments
   - average value: average **97.213**, lowest 84.022 [85], highest 100.905 [57]
   - max force: average 148.215, smallest 30.342 [86] largest 463.159 [78]
   - trajectory of the case with least step  
-  
+
 ![least step case](images/env0-single-camera-85.png)
 - *multiple cameras*
   - **success rate: 98 / 100**
