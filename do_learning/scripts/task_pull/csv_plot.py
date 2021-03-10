@@ -53,15 +53,15 @@ def plot_training_performance():
     fig.show()
 
 def plot_generalize_capability():
-    x = ['env 0', 'env 1', 'env 2', 'env 3', 'env 4', 'env 5']
-    y1 = [100, 55, 20, 7, 5, 0]
-    y2 = [98, 93, 11, 73, 42, 0]
-    y3 = [100, 98, 100, 100, 83, 53]
+    x = ['env 0', 'env 1', 'env 2', 'env 3', 'env 4', 'env 5', 'env 6']
+    y1 = [100, 55, 20, 7, 5, 0, 100]
+    y2 = [98, 93, 11, 73, 42, 0, 100]
+    y3 = [100, 98, 100, 100, 83, 53, 100]
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x = x, y = y1, name='single-camera input'))
-    fig.add_trace(go.Scatter(x = x, y = y2, name='multi-camera fusion'))
-    fig.add_trace(go.Scatter(x = x, y = y3, name='force-vision fusion'))
+    fig.add_trace(go.Bar(x = x, y = y1, name='single-camera input'))
+    fig.add_trace(go.Bar(x = x, y = y2, name='multi-camera fusion'))
+    fig.add_trace(go.Bar(x = x, y = y3, name='force-vision fusion'))
     fig.update_layout(
         title="Policy Generalization",
         xaxis_title="Environments",

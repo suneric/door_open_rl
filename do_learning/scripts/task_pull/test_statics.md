@@ -11,7 +11,7 @@ Three PPO policies were trained for comparison.
 **Reward function** (same for all three policies)
 - if success, reward = 100
 - else if fail ,reward = -10
-- else *reward = 10*delta_door_angle - step_penalty - force_penalty*, where step_penalty is 0.1, force_penalty is 1 when detected force exceeds 70 N, otherwise 0.
+- else reward = 10\*delta_door_angle - step_penalty - force_penalty, where step_penalty is 0.1, force_penalty is 1 when detected force exceeds 70 N, otherwise 0.
 
 ## Summary  
 ### training performance
@@ -30,11 +30,11 @@ Conclusion: vision-force sensor fusion > multiple cameras > single camera
 
 ### policy generalization
 Success rates of different policies applied in different environments
-| \ | env-0 | env-1 | env-2 | env-3 | env-4 | env-5 |
-| :----: | :----: | :----: | :----: | :----: | :----: | :----: |
-| single camera input | 100% | 55% | 20% | 7% | 5% | 0% |
-| multi-camera fusion | 98% | 93% | 11% | 73% | 42% | 0% |
-| force-vision fusion | 100% | 98% | 100% | 100% | 83% | 53% |
+| \ | env-0 | env-1 | env-2 | env-3 | env-4 | env-5 | env-6 |
+| :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
+| single camera input | 100% | 55% | 20% | 7% | 5% | 0% | 100% |
+| multi-camera fusion | 98% | 93% | 11% | 73% | 42% | 0% | 100% |
+| force-vision fusion | 100% | 98% | 100% | 100% | 83% | 53% | 100% |
 
 Environments
 - env-0: same settings as the environment for training
@@ -43,6 +43,7 @@ Environments
 - env-3: different settings in door width, door color, door frame color, wall color, lighting condition, wheel-ground friction coefficients
 - env-4: different settings in door width, door color, door frame color, door handle color, wall color, lighting condition, wheel-ground friction coefficients, door hinge spring force
 - env-5: env-2 with changing wheel-ground **friction coefficients** and adding **camera noise** (Gaussian noise with variance of 0.02)
+- env-6: env-0 with camera position change (the hook is 5cm lower, camera is 2cm back in x direction)
 
 ![generalize](images/generalization.png)   
 
@@ -360,3 +361,59 @@ Environments
   - trajectory of the case with least step
 
 ![least step case](images/env5-force-vision-0.png)
+
+### env 6
+![env-6](images/env_6.png)
+100 test cases with random initial pose of the mobile robot
+
+**Environment Settings**
+- door:
+  - mass: 10kg
+  - width: 0.9m
+  - thickness: 4.5cm
+  - height: 2.1m
+  - color: yellow
+- door hinge:
+  - spring reference: 2 (number of spring)
+  - spring stiffness: 1
+- door frame:
+  - color: gray
+- door handle:
+  - color: white
+- wall:
+  - color: white
+- lighting:
+  - one in room: constant = 1
+  - one out room: constant = 0.5
+- wheel-ground friction: mu1=0.98, mu2=0.98
+- camera noise: 0.00
+- **camera position**: 5 cm lower in z direction, 2 cm back in x direction
+
+**Test Statistics**
+- *single camera*
+  - **success rate: 100 / 100**
+  - failure case []
+  - steps: average **17**, minimum 16 [8], maximum 21 [73]
+  - average value: average **95.689**, lowest 91.199 [95], highest 98.436 [93]
+  - max force: average 147.575, smallest 38.728 [2] largest 265.578 [8]
+  - trajectory of the case with least step
+
+![least step case](images/env6-single-camera-8.png)
+- *multiple cameras*
+- **success rate: 100 / 100**
+- failure case []
+- steps: average **13**, minimum 11 [29], maximum 35 [58]
+- average value: average **100.656**, lowest 88.369 [58], highest 104.538 [15]
+- max force: average 174.547, smallest 22.938 [12] largest 685.727 [96]
+- trajectory of the case with least step
+
+![least step case](images/env6-multiple-cameras-29.png)
+- *force-vision sensor fusion*   
+  - **success rate: 100 / 100**
+  - failure case []
+  - steps: average **12**, minimum 10 [1], maximum 14 [48]
+  - average value: average **91.558**, lowest 80.651 [17], highest 95.068 [8]
+  - max force: average 162.625, smallest 36.708 [16] largest 536.654 [42]
+  - trajectory of the case with least step
+
+![least step case](images/env6-force-vision-1.png)
