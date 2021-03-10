@@ -48,7 +48,8 @@ def plot_training_performance():
             family="Courier New, monospace",
             size=20,
             color="RebeccaPurple"
-        )
+        ),
+        plot_bgcolor="rgb(255,255,255)"
     )
     fig.show()
 
@@ -71,7 +72,8 @@ def plot_generalize_capability():
             family="Courier New, monospace",
             size=20,
             color="RebeccaPurple"
-        )
+        ),
+        plot_bgcolor="rgb(255,255,255)"
     )
     fig.show()
 
