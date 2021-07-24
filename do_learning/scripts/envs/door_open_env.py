@@ -220,7 +220,7 @@ register(
 
 class DoorOpenEnv(GymGazeboEnv):
 
-    def __init__(self,resolution=(64,64), camera='all', cam_noise=0.0, door_width=0.9):
+    def __init__(self,resolution=(64,64), camera='all', cam_noise=0.0, door_width=0.9, door_swinging="left"):
         """
         Initializes a new DoorOpenEnv environment, with define the image size
         and camera noise level (gaussian noise variance, the mean is 0.0)
@@ -230,6 +230,7 @@ class DoorOpenEnv(GymGazeboEnv):
             reset_world_or_sim="WORLD"
         )
 
+        self.door_swinging = door_swinging
         self.door_dim = [door_width, 0.045] # door dimension [length,width]
         self.action_space = self._action_space()
 
@@ -259,6 +260,8 @@ class DoorOpenEnv(GymGazeboEnv):
         """
         vx, vz = 1.0, 3.14
         base = np.array([[vx,vz],[vx,0.0],[0.0,vz],[-vx,vz],[-vx,0.0],[vx,-vz],[0.0,-vz],[-vx,-vz]])
+        if self.door_swinging == "right":
+            base = np.array([[vx,-vz],[vx,0.0],[0.0,-vz],[-vx,-vz],[-vx,0.0],[vx,vz],[0.0,vz],[-vx,vz]])
         low, high = base,3*base
         action_space = np.concatenate((low,high),axis=0)
         # print(action_space)
@@ -303,6 +306,8 @@ class DoorOpenEnv(GymGazeboEnv):
         img_front = self.front_camera.grey_arr()
         img_back = self.back_camera.grey_arr()
         img_up = self.up_camera.grey_arr()
+        if self.door_swinging == "right":
+            img_up = np.fliplr(img_up)
         images = np.concatenate((img_front,img_back,img_up),axis=2)
         if self.visual_mode == 'up':
             images = img_up
@@ -314,12 +319,17 @@ class DoorOpenEnv(GymGazeboEnv):
             images = self.up_camera.zero_arr()
         # force sensor information (x,y,z)
         forces = self.tf_sensor.data()
+        if self.door_swinging == "right":
+            forces[1] = -forces[1]
         return (images, forces)
 
     def _display_images(self):
         front = self.front_camera.rgb_image
         back = self.back_camera.rgb_image
         up = self.up_camera.rgb_image
+        if self.door_swinging == "right":
+            up = np.fliplr(up)
+
         img = np.concatenate((front,back,up),axis=1)
         if self.visual_mode == 'up':
             img = up
@@ -331,6 +341,7 @@ class DoorOpenEnv(GymGazeboEnv):
             img = self.up_camera.zero_arr()
 
         cv2.namedWindow("front-back-up")
+        # img = self.up_camera.grey_arr()
         img = cv2.resize(img, None, fx=0.5, fy=0.5)
         cv2.imshow('front-back-up',img)
         cv2.waitKey(1)
@@ -344,6 +355,8 @@ class DoorOpenEnv(GymGazeboEnv):
         footprint_rf = self._robot_footprint_position(0.25,-0.25)
         footprint_rr = self._robot_footprint_position(-0.25,-0.25)
         camera_pose = self._robot_footprint_position(0.5,-0.25)
+        if self.door_swinging == "right":
+            camera_pose = self._robot_footprint_position(0.5,0.25)
         info = {}
         info['door'] = (door_radius,door_angle)
         info['robot'] = [(footprint_lf[0,3],footprint_lf[1,3]),
@@ -435,23 +448,28 @@ class DoorOpenEnv(GymGazeboEnv):
     # return radius to (0,0) and angle 0 for (0,1,0)
     def _camera_position(self):
         cam_pose = self._robot_footprint_position(0.5,-0.25)
+        if self.door_swinging == "right":
+            cam_pose = self._robot_footprint_position(0.5,0.25)
         angle = math.atan2(cam_pose[0,3],cam_pose[1,3])
         radius = math.sqrt(cam_pose[0,3]*cam_pose[0,3]+cam_pose[1,3]*cam_pose[1,3])
-        return radius, angle
+        return radius, abs(angle)
 
     # door position in polar coordinate frame
     # retuen radius to (0,0) and angle 0 for (0,1,0)
     def _door_position(self):
         door_matrix = self._pose_matrix(self.pose_sensor.door())
-        door_edge = np.array([[1,0,0,self.door_dim[0]],
-                            [0,1,0,0],
+        door_edge_x = self.door_dim[0]
+        door_edge_y = 0
+        if self.door_swinging == "right":
+            door_edge_y = -0.045
+        door_edge = np.array([[1,0,0,door_edge_x],
+                            [0,1,0,door_edge_y],
                             [0,0,1,0],
                             [0,0,0,1]])
         door_edge_mat = np.dot(door_matrix, door_edge)
         # open angle [0, pi/2]
         open_angle = math.atan2(door_edge_mat[0,3],door_edge_mat[1,3])
-        return self.door_dim[0], open_angle
-
+        return self.door_dim[0], abs(open_angle)
 
     # robot is out of the door way (x < 0)
     def _robot_is_out(self):
@@ -460,11 +478,18 @@ class DoorOpenEnv(GymGazeboEnv):
         fp_lr = self._robot_footprint_position(-0.25,0.25)
         fp_rf = self._robot_footprint_position(0.25,-0.25)
         fp_rr = self._robot_footprint_position(-0.25,-0.25)
-        cam_p = self._robot_footprint_position(0.5,-0.25)
-        if fp_lf[0,3] < 0.0 and fp_lr[0,3] < 0.0 and fp_rf[0,3] < 0.0 and fp_rr[0,3] < 0.0 and cam_p[0,3] < 0.0:
-            return True
+        if self.door_swinging == "left":
+            cam_p = self._robot_footprint_position(0.5,-0.25)
+            if fp_lf[0,3] < 0.0 and fp_lr[0,3] < 0.0 and fp_rf[0,3] < 0.0 and fp_rr[0,3] < 0.0 and cam_p[0,3] < 0.0:
+                return True
+            else:
+                return False
         else:
-            return False
+            cam_p = self._robot_footprint_position(0.5,0.25)
+            if fp_lf[0,3] > 0.0 and fp_lr[0,3] > 0.0 and fp_rf[0,3] > 0.0 and fp_rr[0,3] > 0.0 and cam_p[0,3] > 0.0:
+                return True
+            else:
+                return False
 
     def _robot_is_in(self):
         # footprint of robot
@@ -473,12 +498,19 @@ class DoorOpenEnv(GymGazeboEnv):
         fp_lr = self._robot_footprint_position(-0.25,0.25)
         fp_rf = self._robot_footprint_position(0.25,-0.25)
         fp_rr = self._robot_footprint_position(-0.25,-0.25)
-        cam_p = self._robot_footprint_position(0.5,-0.25)
         d_x = dr*math.sin(da)
-        if fp_lf[0,3] > d_x and fp_lr[0,3] > d_x and fp_rf[0,3] > d_x and fp_rr[0,3] > d_x and cam_p[0,3] > d_x:
-            return True
+        if self.door_swinging == "left":
+            cam_p = self._robot_footprint_position(0.5,-0.25)
+            if fp_lf[0,3] > d_x and fp_lr[0,3] > d_x and fp_rf[0,3] > d_x and fp_rr[0,3] > d_x and cam_p[0,3] > d_x:
+                return True
+            else:
+                return False
         else:
-            return False
+            cam_p = self._robot_footprint_position(0.5,0.25)
+            if fp_lf[0,3] < -d_x and fp_lr[0,3] < -d_x and fp_rf[0,3] < -d_x and fp_rr[0,3] < -d_x and cam_p[0,3] < -d_x:
+                return True
+            else:
+                return False
 
     # utility function
     def _robot_footprint_position(self,x,y):

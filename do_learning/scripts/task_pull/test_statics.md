@@ -30,11 +30,11 @@ Conclusion: vision-force sensor fusion > multiple cameras > single camera
 
 ### policy generalization
 Success rates of different policies applied in different environments
-| \ | env-0 | env-1 | env-2 | env-3 | env-4 | env-5 | env-6 |
-| :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
-| single camera input | 100% | 55% | 20% | 7% | 5% | 0% | 100% |
-| multi-camera fusion | 98% | 93% | 11% | 73% | 42% | 0% | 100% |
-| force-vision fusion | 100% | 98% | 100% | 100% | 83% | 53% | 100% |
+| \ | env-0 | env-1 | env-2 | env-3 | env-4 | env-5 | env-6 | env-7 | env-8 | env-9| env-10|
+| :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
+| single camera input | 100% | 55% | 20% | 7% | 5% | 0% | 100% | 100% | 100% | 100% | 87% |
+| multi-camera fusion | 98% | 93% | 11% | 73% | 42% | 0% | 100% | 87% | 98% | 76% | 55% |
+| force-vision fusion | 100% | 98% | 100% | 100% | 83% | 53% | 100% | 72% | 98% | 72% | 92% |
 
 Environments
 - env-0: same settings as the environment for training
@@ -44,6 +44,10 @@ Environments
 - env-4: different settings in door width, door color, door frame color, door handle color, wall color, lighting condition, wheel-ground friction coefficients, door hinge spring force
 - env-5: env-2 with changing wheel-ground **friction coefficients** and adding **camera noise** (Gaussian noise with variance of 0.02)
 - env-6: env-0 with camera position change (the hook is 5cm lower, camera is 2cm back in x direction)
+- env-7: env-0 with camera rotation (up camera rotation angle is 10 degree)
+- env-8: env-0 with camera rotation (up camera rotation angle is 5 degree)
+- env-9: env-0 with camera rotation (up camera rotation angle is 15 degree)
+- env10: env-0 with left-handle swing door and left side bar
 
 ![generalize](images/generalization.png)   
 
@@ -363,7 +367,7 @@ Environments
 ![least step case](images/env5-force-vision-0.png)
 
 ### env 6
-![env-6](images/env_6.png)
+![env-6](images/env_0.png)
 100 test cases with random initial pose of the mobile robot
 
 **Environment Settings**
@@ -387,7 +391,7 @@ Environments
   - one out room: constant = 0.5
 - wheel-ground friction: mu1=0.98, mu2=0.98
 - camera noise: 0.00
-- **camera position**: 5 cm lower in z direction, 2 cm back in x direction
+- **camera position**: 5 cm lower in z direction (link_hook z - 0.05), 2 cm back in x direction (cam_up, x = 0)
 
 **Test Statistics**
 - *single camera*
@@ -400,12 +404,12 @@ Environments
 
 ![least step case](images/env6-single-camera-8.png)
 - *multiple cameras*
-- **success rate: 100 / 100**
-- failure case []
-- steps: average **13**, minimum 11 [29], maximum 35 [58]
-- average value: average **100.656**, lowest 88.369 [58], highest 104.538 [15]
-- max force: average 174.547, smallest 22.938 [12] largest 685.727 [96]
-- trajectory of the case with least step
+  - **success rate: 100 / 100**
+  - failure case []
+  - steps: average **13**, minimum 11 [29], maximum 35 [58]
+  - average value: average **100.656**, lowest 88.369 [58], highest 104.538 [15]
+  - max force: average 174.547, smallest 22.938 [12] largest 685.727 [96]
+  - trajectory of the case with least step
 
 ![least step case](images/env6-multiple-cameras-29.png)
 - *force-vision sensor fusion*   
@@ -417,3 +421,221 @@ Environments
   - trajectory of the case with least step
 
 ![least step case](images/env6-force-vision-1.png)
+
+
+### env 7
+![env-7](images/env_0.png)
+100 test cases with random initial pose of the mobile robot
+
+**Environment Settings**
+- door:
+  - mass: 10kg
+  - width: 0.9m
+  - thickness: 4.5cm
+  - height: 2.1m
+  - color: yellow
+- door hinge:
+  - spring reference: 2 (number of spring)
+  - spring stiffness: 1
+- door frame:
+  - color: gray
+- door handle:
+  - color: white
+- wall:
+  - color: white
+- lighting:
+  - one in room: constant = 1
+  - one out room: constant = 0.5
+- wheel-ground friction: mu1=0.98, mu2=0.98
+- camera noise: 0.00
+- **camera position**: rotation (yaw) angle 10 degree (camp_up roll = 0.174)
+
+**Test Statistics**
+- *single camera*
+  - **success rate: 100 / 100**
+  - failure case []
+  - steps: average **15**, minimum 15 [2], maximum 24 [73]
+  - average value: average **96.329**, lowest 89.91 [65], highest 101.624 [8]
+  - max force: average 113.69, smallest 37.74 [85] largest 344.972 [73]
+  - trajectory of the case with least step
+
+![least step case](images/env7-single-camera-2.png)
+- *multiple cameras*
+  - **success rate: 87 / 100**
+  - failure case [6, 12, 17, 22, 39, 65, 69, 73, 74, 78, 92, 95, 98]
+  - steps: average **13**, minimum 10 [0], maximum 35 [53]
+  - average value: average **95.334**, lowest 88.29 [53], highest 98.42 [75]
+  - max force: average 194.68, smallest 20.02 [57] largest 783.35 [71]
+  - trajectory of the case with least step
+
+![least step case](images/env6-multiple-cameras-29.png)
+- *force-vision sensor fusion*   
+  - **success rate: 72 / 100**
+  - failure case [3, 5, 15, 21, 23, 26, 27, 28, 31, 33, 35, 38, 41, 44, 51, 54, 56, 61, 67, 71, 76, 80, 81, 83, 84, 94, 96, 99]
+  - steps: average **18**, minimum 11 [21], maximum 55 [52]
+  - average value: average **92.788**, lowest 77.85 [50], highest 96.81 [52]
+  - max force: average 293.977, smallest 36.476 [14] largest 3581 [21]
+  - trajectory of the case with least step
+
+![least step case](images/env7-force-vision-21.png)
+
+### env 8
+![env-8](images/env_0.png)
+100 test cases with random initial pose of the mobile robot
+
+**Environment Settings**
+- door:
+  - mass: 10kg
+  - width: 0.9m
+  - thickness: 4.5cm
+  - height: 2.1m
+  - color: yellow
+- door hinge:
+  - spring reference: 2 (number of spring)
+  - spring stiffness: 1
+- door frame:
+  - color: gray
+- door handle:
+  - color: white
+- wall:
+  - color: white
+- lighting:
+  - one in room: constant = 1
+  - one out room: constant = 0.5
+- wheel-ground friction: mu1=0.98, mu2=0.98
+- camera noise: 0.00
+- **camera position**: rotation (yaw) angle 10 degree (camp_up roll = 0.174)
+
+**Test Statistics**
+- *single camera*
+  - **success rate: 100 / 100**
+  - failure case []
+  - steps: average **16**, minimum 15 [8], maximum 24 [6]
+  - average value: average **97.086**, lowest 91.77 [47], highest 101.164 [66]
+  - max force: average 117.655, smallest 28.95 [40] largest 405.96 [6]
+  - trajectory of the case with least step
+
+![least step case](images/env8-single-camera-8.png)
+- *multiple cameras*
+  - **success rate: 98 / 100**
+  - failure case [32,87]
+  - steps: average **13**, minimum 9 [73], maximum 35 [6]
+  - average value: average **95.89**, lowest 88.88 [64], highest 98.93 [73]
+  - max force: average 192.82, smallest 21.28 [77] largest 748.90 [53]
+  - trajectory of the case with least step
+
+![least step case](images/env8-multiple-cameras-73.png)
+- *force-vision sensor fusion*   
+  - **success rate: 98 / 100**
+  - failure case [81,95]
+  - steps: average **11**, minimum 9 [95], maximum 34 [20]
+  - average value: average **94.37**, lowest 82.47 [73], highest 96.87 [54]
+  - max force: average 190.279, smallest 22.181 [58] largest 664.92 [76]
+  - trajectory of the case with least step
+
+![least step case](images/env8-force-vision-21.png)
+
+### env 9
+![env-9](images/env_0.png)
+100 test cases with random initial pose of the mobile robot
+
+**Environment Settings**
+- door:
+  - mass: 10kg
+  - width: 0.9m
+  - thickness: 4.5cm
+  - height: 2.1m
+  - color: yellow
+- door hinge:
+  - spring reference: 2 (number of spring)
+  - spring stiffness: 1
+- door frame:
+  - color: gray
+- door handle:
+  - color: white
+- wall:
+  - color: white
+- lighting:
+  - one in room: constant = 1
+  - one out room: constant = 0.5
+- wheel-ground friction: mu1=0.98, mu2=0.98
+- camera noise: 0.00
+- **camera position**: rotation (yaw) angle 10 degree (camp_up roll = 0.174)
+
+**Test Statistics**
+- *single camera*
+  - **success rate: 100 / 100**
+  - failure case []
+  - steps: average **16**, minimum 14 [43], maximum 49 [98]
+  - average value: average **95.026**, lowest 78.94 [73], highest 107.19 [98]
+  - max force: average 134.98, smallest 42.529 [11] largest 655.27 [98]
+  - trajectory of the case with least step
+
+![least step case](images/env9-single-camera-43.png)
+- *multiple cameras*
+  - **success rate: 76 / 100**
+  - failure case [2, 6, 11, 12, 14, 17, 25, 32, 33, 39, 40, 47, 48, 58, 62, 65, 74, 78, 85, 91, 92, 94, 95, 97]
+  - steps: average **14**, minimum 10 [20], maximum 23 [16]
+  - average value: average **94.15**, lowest 89.32 [53], highest 97.42 [20]
+  - max force: average 187.15, smallest 44.63 [54] largest 686.69 [57]
+  - trajectory of the case with least step
+
+![least step case](images/env9-multiple-cameras-20.png)
+- *force-vision sensor fusion*   
+  - **success rate: 72 / 100**
+  - failure case [4, 8, 9, 13, 18, 23, 34, 35, 37, 38, 42, 43, 45, 52, 53, 57, 58, 60, 66, 72, 75, 79, 80, 82, 87, 88, 89, 93]
+  - steps: average **34**, minimum 16 [9], maximum 53 [30]
+  - average value: average **83.51**, lowest 71.43 [13], highest 93.47 [42]
+  - max force: average 277.457, smallest 52.23 [9] largest 725.41 [13]
+  - trajectory of the case with least step
+
+![least step case](images/env9-force-vision-9.png)
+
+### env 10 (fourwheeler_base_l)
+![env-10](images/env_5.png)
+100 test cases with random initial pose of the mobile robot
+
+**Environment Settings**
+- door:
+  - mass: 10kg
+  - width: 0.9m
+  - thickness: 4.5cm
+  - height: 2.1m
+  - color: yellow
+- door hinge:
+  - spring reference: 2 (number of spring)
+  - spring stiffness: 1
+- door frame:
+  - color: gray
+- door handle:
+  - color: white
+- wall:
+  - color: white
+- lighting:
+  - one in room: constant = 1
+  - one out room: constant = 0.5
+- wheel-ground friction: mu1=0.98, mu2=0.98
+- camera noise: 0.00
+- **camera position**: rotation (yaw) angle 10 degree (camp_up roll = 0.174)
+
+**Test Statistics**
+- *single camera*
+  - **success rate: 87 / 100**
+  - failure case [6, 14, 25, 37, 48, 53, 56, 59, 82, 84, 86, 92, 95]
+  - steps: average **19**, minimum 14 [22], maximum 44 [11]
+  - average value: average **82.99**, lowest 72.66 [52], highest 90.73 [57]
+  - max force: average 210.21, smallest 50.208 [31] largest 463.67 [77]
+
+- *multiple cameras*
+  - **success rate: 55 / 100**
+  - failure case [0, 1, 6, 8, 10, 12, 14, 17, 20, 21, 24, 26, 27, 30, 32, 34, 36, 38, 41, 42, 43, 44, 46, 47, 48, 50, 54, 55, 58, 62, 64, 65, 70, 73, 77, 81, 84, 89, 92, 94, 95, 96, 97, 98, 99]
+  - steps: average **15**, minimum 10 [1], maximum 24 [28]
+  - average value: average **81.88**, lowest 68.78 [28], highest 89.1 [18]
+  - max force: average 457.29, smallest 86.33 [1] largest 955.35 [49]
+
+- *force-vision sensor fusion*   
+  - **success rate: 92 / 100**
+  - failure case [9, 13, 18, 43, 49, 75, 79, 93]
+  - steps: average **11**, minimum 9 [46], maximum 14 [11]
+  - average value: average **58.88**, lowest 47.18 [41], highest 72.26 [68]
+  - max force: average 258.839, smallest 48.83 [46] largest 889.96 [15]

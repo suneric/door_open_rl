@@ -2,6 +2,7 @@
 from __future__ import print_function
 
 import sys
+import csv
 sys.path.append('..')
 sys.path.append('.')
 import os
@@ -128,6 +129,14 @@ randref_100 = [[0.09244612, 0.28971416, 0.39807551],
        [0.98730827, 0.92550436, 0.10753562],
        [0.27999242, 0.42432665, 0.74311562]]
 
+def save_forces(forces, file):
+    force_arr = np.array(forces)
+    with open(file,mode='w') as force_file:
+        fieldnames = ["index","x","y","z"]
+        writer = csv.DictWriter(force_file, fieldnames=fieldnames)
+        writer.writeheader()
+        for i in range(len(force_arr)):
+            writer.writerow({"index":i,'x':force_arr[i,0],'y':force_arr[i,1],'z':force_arr[i,2]})
 
 def plot_forces(forces, steps, ax):
     force_arr = np.array(forces)
@@ -312,6 +321,7 @@ def get_args():
     parser.add_argument('--critic_model',type=str, default="ppo_noise0.0/val_net/10000") # ppo model
     parser.add_argument('--use_force_in_reward', default=True)
     parser.add_argument('--plot', default=True)
+    parser.add_argument('--door_swinging', default="left")
     return parser.parse_args()
 
 np.random.seed(123)
@@ -327,7 +337,7 @@ if __name__ == "__main__":
     rospy.init_node('door_pull_test', anonymous=True, log_level=rospy.INFO)
 
     # run specific task with specific policy
-    env = DoorPullEnv(resolution=(64,64),camera= args.camera, cam_noise=args.noise, use_force=args.use_force_in_reward, door_width=args.door_width)
+    env = DoorPullEnv(resolution=(64,64),camera= args.camera, cam_noise=args.noise, use_force=args.use_force_in_reward, door_width=args.door_width, door_swinging=args.door_swinging)
     act_dim = env.action_dimension()
     visual_dim = env.visual_dimension()
     agent = PPOConvAgent(state_dim=visual_dim, action_size=act_dim)
@@ -337,7 +347,8 @@ if __name__ == "__main__":
     critic_path = os.path.join(sys.path[0], '..', "policy", "door_pull", args.critic_model)
     agent.load(actor_path, critic_path)
 
-    trajectories, forces, actions, values, failures = run_ppo_test(args.eps,env,agent,args.max_steps,randref_100[0:args.eps][:])
+    trajectories, forces, actions, values, failures = run_ppo_test(args.eps,env,agent,args.max_steps,randref_100[25:25+args.eps][:])
+
     if len(trajectories) == 0:
         print("No successful test");
     else:
@@ -368,6 +379,10 @@ if __name__ == "__main__":
         if args.plot:
             # plot trajectory with least number of steps
             ls_idx = trajectory_steps.index(min(trajectory_steps))
+
+            force_csv = "/home/yufeng/Temp/force"+str(ls_idx)+".csv"
+            save_forces(forces[ls_idx],force_csv)
+
             steps = len(trajectories[ls_idx])
             fig0,ax0 = plt.subplots(2,2)
             plot_trajectorty(trajectories[ls_idx], ax0[0][0])

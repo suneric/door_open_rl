@@ -256,7 +256,7 @@
       <joint name="joint_fbummer_hook" type="revolute">
         <axis xyz="0 1 0" rpy="0 0 0"/>
         <limit velocity="0" effort="1000" lower="0" upper="0"/>
-        <origin xyz="${bumper_x/2} -${bumper_y/2} ${bumper_z/2}" rpy="0 0 0"/>
+        <origin xyz="${bumper_x/2} ${bumper_y/2} ${bumper_z/2}" rpy="0 0 0"/>
         <parent link="link_fbumper"/>
         <child link="link_hook"/>
       </joint>
@@ -286,13 +286,13 @@
       </joint>
       <link name="link_tip">
         <visual>
-          <origin xyz="${tip_x/2} 0.02 ${tip_z/2}" rpy="0 0 0" />
+          <origin xyz="${tip_x/2} -0.02 ${tip_z/2}" rpy="0 0 0" />
           <geometry>
             <box size="${tip_x} ${tip_y} ${tip_z}"/>
           </geometry>
         </visual>
         <collision>
-          <origin xyz="${tip_x/2} 0.02 ${tip_z/2}" rpy="0 0 0" />
+          <origin xyz="${tip_x/2} -0.02 ${tip_z/2}" rpy="0 0 0" />
           <geometry>
             <box size="${tip_x} ${tip_y} ${tip_z}"/>
           </geometry>
