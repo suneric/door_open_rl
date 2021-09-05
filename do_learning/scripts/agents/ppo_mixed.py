@@ -13,6 +13,7 @@ to multiple dimensions. It is used in multinomial logistic regression and is oft
 the last activation function of a neural network to normalized the output of a network to a
 probability distribution over predicted output classes.
 """
+# original dnn: 1,067,857 trainable parameters
 def mixed_net(image_dim, force_dim, outputs_dim, outputs_activation='softmax'):
     # visual inputs
     i_inputs = keras.Input(shape=image_dim, name='images')
@@ -37,6 +38,33 @@ def mixed_net(image_dim, force_dim, outputs_dim, outputs_activation='softmax'):
     # output of direction for driving the robot
     outputs = layers.Dense(outputs_dim, activation=outputs_activation)(mixed)
     return keras.Model(inputs=[i_model.input,f_model.input],outputs=outputs)
+
+# lighter version DNN: 71,913 trainable parameters
+def mixed_net_1(image_dim, force_dim, outputs_dim, outputs_activation='softmax'):
+    # visual inputs
+    i_inputs = keras.Input(shape=image_dim, name='images')
+    xi = layers.Conv2D(32,(3,3), padding='same', activation='relu')(i_inputs)
+    xi = layers.MaxPool2D((2,2))(xi)
+    xi = layers.Conv2D(16, (3,3), padding='same', activation='relu')(xi)
+    xi = layers.MaxPool2D((2,2))(xi)
+    xi = layers.Conv2D(8, (3,3), padding='same', activation='relu')(xi)
+    xi = layers.Flatten()(xi)
+    i_outputs = layers.Dense(32,activation='relu')(xi)
+    i_model = keras.Model(inputs=i_inputs,outputs=i_outputs)
+
+    # force inputs
+    f_inputs = keras.Input(shape=force_dim, name="forces")
+    xf = layers.Dense(16,activation='relu')(f_inputs)
+    f_outputs = layers.Dense(8,activation='relu')(xf)
+    f_model = keras.Model(inputs=f_inputs,outputs=f_outputs)
+
+    # combile image input and force input
+    mixed = layers.concatenate([i_model.output, f_model.output])
+
+    # output of direction for driving the robot
+    outputs = layers.Dense(outputs_dim, activation=outputs_activation)(mixed)
+    return keras.Model(inputs=[i_model.input,f_model.input],outputs=outputs)
+
 
 """
 Replay Buffer, strore experiences and calculate total rewards, advanteges

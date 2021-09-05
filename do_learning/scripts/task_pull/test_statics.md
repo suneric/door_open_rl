@@ -3,6 +3,7 @@ Three PPO policies were trained for comparison.
 - single-camera input (looking up)
 - multi-camera fusion (looking up, looking forward, and looking backward)
 - force-vision fusion (one camera looking up and a force sensor at the joint of the sidebar)
+- force-vision fusion lighter network (lighter DNN)
 
 **Camera perspectives**
 
@@ -25,16 +26,18 @@ Conclusion: vision-force sensor fusion > multiple cameras > single camera
 | \ | success rate | average steps | average max-force (N) | least step case trajectory cost (robot+sidebar) (m) |
 | :----: | :----: | :----: | :----: | :----: |
 | single-camera input | 100% | 16 (13-20) | 148 (30 - 463) | 0.835 + 1.247 |
-| multi-camera fusion | 98% |13 (10-47) | 191 (19 - 756) | 0.893 + 1.108 |
-| force-vision fusion | 100% |11 (10-13) | 182 (26-826) | 0.571 + 1.015 |
+| multi-camera fusion | 98%  | 13 (10-47) | 191 (19 - 756) | 0.893 + 1.108 |
+| force-vision fusion | 100% | 11 (10-13) | 182 (26 - 826) | 0.571 + 1.015 |
+| force-vision light  | 100% | 21 (17-28) | 148 (43 - 668) | 1.674 + 1.637 |
 
 ### policy generalization
 Success rates of different policies applied in different environments
 | \ | env-0 | env-1 | env-2 | env-3 | env-4 | env-5 | env-6 | env-7 | env-8 | env-9| env-10|
 | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
-| single camera input | 100% | 55% | 20% | 7% | 5% | 0% | 100% | 100% | 100% | 100% | 87% |
-| multi-camera fusion | 98% | 93% | 11% | 73% | 42% | 0% | 100% | 87% | 98% | 76% | 55% |
-| force-vision fusion | 100% | 98% | 100% | 100% | 83% | 53% | 100% | 72% | 98% | 72% | 92% |
+| single camera input | 100% | 55% | 20%  | 7%   | 5%  | 0%  | 100% | 100% | 100% | 100% | 87% |
+| multi-camera fusion | 98%  | 93% | 11%  | 73%  | 42% | 0%  | 100% | 87%  | 98%  | 76%  | 55% |
+| force-vision fusion | 100% | 98% | 100% | 100% | 83% | 53% | 100% | 72%  | 98%  | 72%  | 92% |
+| force-vision light  | 100% | 99% | 61%  | 98%  | 98% | 0%  | 99%  | 96%  | 99%  | 94%  | 92% |
 
 Environments
 - env-0: same settings as the environment for training
@@ -391,7 +394,7 @@ Environments
   - one out room: constant = 0.5
 - wheel-ground friction: mu1=0.98, mu2=0.98
 - camera noise: 0.00
-- **camera position**: 5 cm lower in z direction (link_hook z - 0.05), 2 cm back in x direction (cam_up, x = 0)
+- **camera position**: 5 cm lower in z direction (joint_fbumper_hook z - 0.05), 2 cm back in x direction (cam_up, x = 0)
 
 **Test Statistics**
 - *single camera*
@@ -504,7 +507,7 @@ Environments
   - one out room: constant = 0.5
 - wheel-ground friction: mu1=0.98, mu2=0.98
 - camera noise: 0.00
-- **camera position**: rotation (yaw) angle 10 degree (camp_up roll = 0.174)
+- **camera position**: rotation (yaw) angle 5 degree (up roll 0.087)
 
 **Test Statistics**
 - *single camera*
@@ -560,7 +563,7 @@ Environments
   - one out room: constant = 0.5
 - wheel-ground friction: mu1=0.98, mu2=0.98
 - camera noise: 0.00
-- **camera position**: rotation (yaw) angle 10 degree (camp_up roll = 0.174)
+- **camera position**: rotation (yaw) angle 15 degree (up roll 0.2617)
 
 **Test Statistics**
 - *single camera*

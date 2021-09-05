@@ -347,7 +347,7 @@ if __name__ == "__main__":
     critic_path = os.path.join(sys.path[0], '..', "policy", "door_pull", args.critic_model)
     agent.load(actor_path, critic_path)
 
-    trajectories, forces, actions, values, failures = run_ppo_test(args.eps,env,agent,args.max_steps,randref_100[25:25+args.eps][:])
+    trajectories, forces, actions, values, failures = run_ppo_test(args.eps,env,agent,args.max_steps,randref_100[0:args.eps][:])
 
     if len(trajectories) == 0:
         print("No successful test");

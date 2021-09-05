@@ -37,10 +37,10 @@ def plot_training_performance():
     df3 = pd.read_csv(force_vision)
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x = df0['Step'], y = smoothExponential(df0['Value'],0.996),name='force-only input'))
-    fig.add_trace(go.Scatter(x = df1['Step'], y = smoothExponential(df1['Value'],0.996),name='single-camera input'))
-    fig.add_trace(go.Scatter(x = df2['Step'], y = smoothExponential(df2['Value'],0.996),name='multi-camera fusion'))
-    fig.add_trace(go.Scatter(x = df3['Step'], y = smoothExponential(df3['Value'],0.996),name='force-vision fusion'))
+    fig.add_trace(go.Scatter(x = df0['Step'], y = smoothExponential(df0['Value'],0.996),name='force-only input', marker=dict(color='#0075DC')))
+    fig.add_trace(go.Scatter(x = df1['Step'], y = smoothExponential(df1['Value'],0.996),name='single-camera input', marker=dict(color='#191919')))
+    fig.add_trace(go.Scatter(x = df2['Step'], y = smoothExponential(df2['Value'],0.996),name='multi-camera fusion', marker=dict(color='#FFA405')))
+    fig.add_trace(go.Scatter(x = df3['Step'], y = smoothExponential(df3['Value'],0.996),name='force-vision fusion', marker=dict(color='#00998F')))
     fig.update_layout(
         title="Episodic Total Reward",
         xaxis_title="Episodes",
@@ -49,7 +49,7 @@ def plot_training_performance():
         font=dict(
             family="Arial",
             size=20,
-            color="RebeccaPurple"
+            color="Black"
         ),
         plot_bgcolor="rgb(255,255,255)"
     )
@@ -62,9 +62,9 @@ def plot_generalize_capability():
     y3 = [100, 98, 100, 100, 83, 53, 100, 98, 92]
 
     fig = go.Figure()
-    fig.add_trace(go.Bar(x = x, y = y1, name='single-camera input'))
-    fig.add_trace(go.Bar(x = x, y = y2, name='multi-camera fusion'))
-    fig.add_trace(go.Bar(x = x, y = y3, name='force-vision fusion'))
+    fig.add_trace(go.Bar(x = x, y = y1, name='single-camera input', marker=dict(color='#191919')))
+    fig.add_trace(go.Bar(x = x, y = y2, name='multi-camera fusion', marker=dict(color='#FFA405')))
+    fig.add_trace(go.Bar(x = x, y = y3, name='force-vision fusion', marker=dict(color='#00998F')))
     fig.update_layout(
         title="Policy Generalization",
         xaxis_title="Environments",
@@ -73,7 +73,7 @@ def plot_generalize_capability():
         font=dict(
             family="Arial",
             size=20,
-            color="RebeccaPurple"
+            color="Black"
         ),
         plot_bgcolor="rgb(255,255,255)"
     )
@@ -88,21 +88,21 @@ def plot_force_profile():
     dffv = pd.read_csv(force_fv)
     #
     fig = make_subplots(rows=3,cols=1)
-    fig.add_trace(go.Scatter(x = dfsc['index']/100, y = dfsc['x'],name='single-camera input', legendgroup="single-camera input", marker=dict(color='red')), row=1,col=1)
-    fig.add_trace(go.Scatter(x = dfmc['index']/100, y = dfmc['x'],name='multi-camera fusion', legendgroup="multi-camera fusion", marker=dict(color='blue')), row=1,col=1)
-    fig.add_trace(go.Scatter(x = dffv['index']/100, y = dffv['x'],name='force-vision fusion', legendgroup="force-vision fusion", marker=dict(color='green')), row=1,col=1)
+    fig.add_trace(go.Scatter(x = dfsc['index']/100, y = dfsc['x'],name='single-camera input', legendgroup="single-camera input", marker=dict(color='#191919')), row=1,col=1)
+    fig.add_trace(go.Scatter(x = dfmc['index']/100, y = dfmc['x'],name='multi-camera fusion', legendgroup="multi-camera fusion", marker=dict(color='#FFA405')), row=1,col=1)
+    fig.add_trace(go.Scatter(x = dffv['index']/100, y = dffv['x'],name='force-vision fusion', legendgroup="force-vision fusion", marker=dict(color='#00998F')), row=1,col=1)
 
-    fig.add_trace(go.Scatter(x = dfsc['index']/100, y = dfsc['y'],name='single-camera input', legendgroup="single-camera input", marker=dict(color='red'), showlegend=False), row=2,col=1)
-    fig.add_trace(go.Scatter(x = dfmc['index']/100, y = dfmc['y'],name='multi-camera fusion', legendgroup="multi-camera fusion", marker=dict(color='blue'), showlegend=False), row=2,col=1)
-    fig.add_trace(go.Scatter(x = dffv['index']/100, y = dffv['y'],name='force-vision fusion', legendgroup="force-vision fusion", marker=dict(color='green'), showlegend=False), row=2,col=1)
+    fig.add_trace(go.Scatter(x = dfsc['index']/100, y = dfsc['y'],name='single-camera input', legendgroup="single-camera input", marker=dict(color='#191919'), showlegend=False), row=2,col=1)
+    fig.add_trace(go.Scatter(x = dfmc['index']/100, y = dfmc['y'],name='multi-camera fusion', legendgroup="multi-camera fusion", marker=dict(color='#FFA405'), showlegend=False), row=2,col=1)
+    fig.add_trace(go.Scatter(x = dffv['index']/100, y = dffv['y'],name='force-vision fusion', legendgroup="force-vision fusion", marker=dict(color='#00998F'), showlegend=False), row=2,col=1)
 
-    fig.add_trace(go.Scatter(x = dfsc['index']/100, y = dfsc['z'],name='single-camera input', legendgroup="single-camera input", marker=dict(color='red'), showlegend=False), row=3,col=1)
-    fig.add_trace(go.Scatter(x = dfmc['index']/100, y = dfmc['z'],name='multi-camera fusion', legendgroup="multi-camera fusion", marker=dict(color='blue'), showlegend=False), row=3,col=1)
-    fig.add_trace(go.Scatter(x = dffv['index']/100, y = dffv['z'],name='force-vision fusion', legendgroup="force-vision fusion", marker=dict(color='green'), showlegend=False), row=3,col=1)
+    fig.add_trace(go.Scatter(x = dfsc['index']/100, y = dfsc['z'],name='single-camera input', legendgroup="single-camera input", marker=dict(color='#191919'), showlegend=False), row=3,col=1)
+    fig.add_trace(go.Scatter(x = dfmc['index']/100, y = dfmc['z'],name='multi-camera fusion', legendgroup="multi-camera fusion", marker=dict(color='#FFA405'), showlegend=False), row=3,col=1)
+    fig.add_trace(go.Scatter(x = dffv['index']/100, y = dffv['z'],name='force-vision fusion', legendgroup="force-vision fusion", marker=dict(color='#00998F'), showlegend=False), row=3,col=1)
 
-    fig.update_xaxes(title_text="time (s)", row=1,col=1)
-    fig.update_xaxes(title_text="time (s)", row=2,col=1)
-    fig.update_xaxes(title_text="time (s)", row=3,col=1)
+    fig.update_xaxes(title_text="Time (s)", row=1,col=1)
+    fig.update_xaxes(title_text="Time (s)", row=2,col=1)
+    fig.update_xaxes(title_text="Time (s)", row=3,col=1)
 
     fig.update_yaxes(title_text="X-Axis Force (N)", row=1,col=1)
     fig.update_yaxes(title_text="Y-Axis Force (N)", row=2,col=1)
@@ -114,7 +114,7 @@ def plot_force_profile():
         font=dict(
             family="Arial",
             size=20,
-            color="RebeccaPurple"
+            color="Black"
         ),
         plot_bgcolor="rgb(255,255,255)"
     )
@@ -173,9 +173,9 @@ def plot_env_force_profile():
     fig.add_trace(go.Scatter(x = env7['index']/100, y = env7['z'],name='env 7', legendgroup="env 7", marker=dict(color='#e53511'), showlegend=False), row=3,col=1)
     fig.add_trace(go.Scatter(x = env8['index']/100, y = env8['z'],name='env 8', legendgroup="env 8", marker=dict(color='#757557'), showlegend=False), row=3,col=1)
 
-    fig.update_xaxes(title_text="time (s)", row=1,col=1)
-    fig.update_xaxes(title_text="time (s)", row=2,col=1)
-    fig.update_xaxes(title_text="time (s)", row=3,col=1)
+    fig.update_xaxes(title_text="Time (s)", row=1,col=1)
+    fig.update_xaxes(title_text="Time (s)", row=2,col=1)
+    fig.update_xaxes(title_text="Time (s)", row=3,col=1)
 
     fig.update_yaxes(title_text="X-Axis Force (N)", row=1,col=1)
     fig.update_yaxes(title_text="Y-Axis Force (N)", row=2,col=1)
@@ -187,7 +187,7 @@ def plot_env_force_profile():
         font=dict(
             family="Arial",
             size=20,
-            color="RebeccaPurple"
+            color="Black"
         ),
         plot_bgcolor="rgb(255,255,255)"
     )
